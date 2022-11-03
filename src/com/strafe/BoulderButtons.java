@@ -12,9 +12,23 @@ public class BoulderButtons extends JButton implements ActionListener {
     private boolean pressed = false;
 
     public BoulderButtons(int x, int y) {
+        this.setBackground(Color.WHITE);
         this.addActionListener(this);
         this.x = x;
         this.y = y;
+
+        //Colors
+        if (this.y == 6) this.setBackground(Color.gray);
+        if (this.x == 0 && this.y == 6) this.setBackground(Color.BLACK);
+        if (this.y == 0) this.setBackground(Color.gray);
+    }
+
+    public boolean isPressed() {
+        return this.pressed;
+    }
+
+    public void setColor(Color c) {
+        this.setBackground(c);
     }
 
     @Override
@@ -26,15 +40,21 @@ public class BoulderButtons extends JButton implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println(x + " " + y);
-        if (!pressed) {
+        if (!pressed && this.y != 6 && this.y!= 0) {
             this.setBackground(Color.RED);
             this.setOpaque(true);
             pressed = true;
-        } else {
-            this.setBackground(Color.ORANGE);
+//            System.out.println("Pressed " + x + " " + y);
+        } else if (this.y != 6 && this.y != 0){
+            this.setBackground(Color.WHITE);
             this.setOpaque(true);
             pressed = false;
+//            System.out.println("Unpressed " + x + " " + y);
+        } else if (this.x == 0 && this.y == 6) {
+            JOptionPane.showMessageDialog(this,"Starting Position, cannot interact");
+        } else {
+            JOptionPane.showMessageDialog(this,"You cannot interact with this row");
         }
     }
+
 }
