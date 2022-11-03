@@ -20,7 +20,7 @@ public class BoulderButtons extends JButton implements ActionListener {
         //Colors
         if (this.y == 6) this.setBackground(Color.gray);
         if (this.x == 0 && this.y == 6) this.setBackground(Color.BLACK);
-        if (this.y == 0) this.setBackground(Color.gray);
+        if (this.y == 0) this.setBackground(Color.GREEN);
     }
 
     public boolean isPressed() {

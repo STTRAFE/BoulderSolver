@@ -18,7 +18,7 @@ public class ButtonGrid extends JPanel implements ActionListener {
     private int COL;
 
     public ButtonGrid(int r,int c) {
-        setLayout(new GridLayout(r+1,c, BORDER, BORDER));
+        setLayout(new GridLayout(r,c, BORDER, BORDER));
         setBackground(Color.WHITE);
 
         ROWS = r;
@@ -26,11 +26,11 @@ public class ButtonGrid extends JPanel implements ActionListener {
 
         grid = new BoulderButtons[ROWS][COL]; //allocate grid
 
-        for (int i=0; i<COL; i++) {
-            JButton finishLine = new JButton();
-            finishLine.setBackground(Color.GREEN);
-            add(finishLine);
-        }
+//        for (int i=0; i<COL; i++) {
+//            JButton finishLine = new JButton();
+//            finishLine.setBackground(Color.GREEN);
+//            add(finishLine);
+//        }
 
         for(int cc=0; cc<COL; cc++){
             for(int rr=0; rr<ROWS; rr++){

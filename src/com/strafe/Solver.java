@@ -65,29 +65,31 @@ public class Solver {
         solvedRoutes = new TreeSet();
         visited = new HashSet<Long>();
         solvedPaths = 0;
-        int[][] newGrid = getDeepCopy(this.grid);
+        int[][] newGrid = copyGrid(grid);
 
-        //Initial location
         Route first = new Route();
         first.grid = grid;
-        first.player = new Point(7, 0);
+        first.player = new Point(7, 0); // Initial location
         routes = new ArrayDeque<Route>();
         visited = new HashSet<Long>();
         routes.add(first);
         solvedRoutes = new TreeSet();
         long startTime = System.currentTimeMillis();
-        while (!routes.isEmpty()) {
+        while (!routes.isEmpty()) { // Iterates through possible routes
             long gridCode;
-            if (System.currentTimeMillis() - startTime > (long) time) {
+            if (System.currentTimeMillis() - startTime > (long) time) { // Returns no solution after certain time period
                 if (solvedPaths != 0) break;
                 return false;
             }
-            if (solvedPaths > 5) break;
+            if (solvedPaths > 5) break; // Prevents more than 5 solutions from created
             Route r = routes.poll();
             if (r == null || visited.contains(gridCode = getGridCode(r.grid))) continue;
             visited.add(gridCode);
+            /*
+             A code is generated based off the grid, then checked against the list of visited locations
+            */
             Point start = r.player;
-            if (start.x == 0) {
+            if (start.x == 0) { // If route ends at top, adds to solved paths
                 solvedRoutes.add(r);
                 solvedPaths++;
                 continue;
@@ -97,60 +99,60 @@ public class Solver {
             ArrayDeque<Point> pMoves = new ArrayDeque<Point>();
             pMoves.add(start);
             block1:
-            while (!pMoves.isEmpty()) {
+            while (!pMoves.isEmpty()) { // Iterates through pMoves queue
                 Point loc = (Point) pMoves.poll();
-                if (playerLocs.contains(loc)) continue;
+                if (playerLocs.contains(loc)) continue; // Pulls player location from pMoves and checks if it already existed
                 playerLocs.add(loc);
-                Set<Point> moves = this.validMoves(loc);
-                for (Point p1 : moves) {
-                    if (p1.x == 0) {
+                Set<Point> moves = validMoves(loc); // Generates possible moves from location, checks if it is valid
+                for (Point p1 : moves) { // Iterates through every valid move
+                    if (p1.x == 0) { // Check if it reaches finishing line (x=0)
                         solvedRoutes.add(r);
                         solvedPaths++;
                         pMoves.clear();
                         continue block1;
                     }
-                    if (grid[p1.x][p1.y] == 1) continue;
+                    if (grid[p1.x][p1.y] == 1) continue; // Checks if there is a boulder, if it does not add to possible Moves
                     pMoves.add(p1);
                 }
             }
-            for (Point p : playerLocs) {
-                getValidPush(p, grid, validMoves(p), r);
+            for (Point p : playerLocs) { // Iterates through every possible position player can get to without moving a Boulder
+                getValidBoulderPush(p, grid, validMoves(p), r); // Checks if there is a valid boulder movement
             }
         }
         if (solvedPaths != 0) {
             Route r = solvedRoutes.pollFirst();
-            if (r == null) {
+            if (r == null) { // Catching error
                 return false;
             }
             solvedRoute = r;
             ArrayDeque<Move> cloned = new ArrayDeque<Move>(r.moveList);
-            while (!cloned.isEmpty()) {
+            while (!cloned.isEmpty()) { // copies the possible moves
                 Move poll = (Move) cloned.poll();
-                pushMove(poll, newGrid);
-                cachedRoute.put(this.getGridCode(newGrid), new ArrayDeque<Move>(cloned));
+                pushBoulder(poll, newGrid);
+                cachedRoute.put(getGridCode(newGrid), new ArrayDeque<Move>(cloned));
             }
-            System.out.println(solvedPaths);
+//            System.out.println(solvedPaths);
             return true;
         }
         return false;
     }
 
-    private void getValidPush(Point start, int[][] grid, Set<Point> moves, Route r) {
+    private void getValidBoulderPush (Point start, int[][] grid, Set<Point> moves, Route r) {
         for (Point p : moves) {
             long gridCode;
-            int[][] newGrid = getDeepCopy(grid);
-            Move push = push(start.x, start.y, p.x, p.y, newGrid);
+            int[][] newGrid = copyGrid(grid);
+            Move push = pushBoulder(start.x, start.y, p.x, p.y, newGrid);
             if (push == null || visited.contains(gridCode = getGridCode(newGrid))) continue;
             Route r1 = new Route(r);
             r1.moveList.add(push);
-            ++r1.moves;
+            r1.moves++;
             r1.grid = newGrid;
             r1.player = push.p;
             routes.add(r1);
         }
     }
 
-    private void pushMove(Move move, int[][] grid) {
+    private void pushBoulder (Move move, int[][] grid) {
         int boxX = move.p.x;
         int boxY = move.p.y;
         if (move.offsetType == 1) {
@@ -168,7 +170,7 @@ public class Solver {
         }
     }
 
-    private Move push(int playerX, int playerY, int boxX, int boxY, int[][] grid) {
+    private Move pushBoulder (int playerX, int playerY, int boxX, int boxY, int[][] grid) {
         if (grid[boxX][boxY] != 1) {
             return null;
         }
@@ -221,7 +223,7 @@ public class Solver {
         return null;
     }
 
-    private Set<Point> validMoves(Point start) {
+    private Set<Point> validMoves (Point start) {
         HashSet<Point> out = new HashSet<Point>();
         int x = start.x;
         int y = start.y;
@@ -244,16 +246,16 @@ public class Solver {
         return out;
     }
 
-    private int[][] getDeepCopy(int[][] input) {
+    private int[][] copyGrid (int[][] input) {
         int[][] out = new int[input.length][input[0].length];
         for (int i = 0; i < input.length; ++i) {
             System.arraycopy(input[i], 0, out[i], 0, input[0].length);
         }
-//        System.out.println(Arrays.deepToString(input));
+        System.out.println(Arrays.deepToString(input));
         return out;
     }
 
-    private long getGridCode(int[][] grid) {
+    private long getGridCode (int[][] grid) {
         long sum = 0L;
         for (int[] i : grid) {
             sum = 7L * sum + (long) Arrays.hashCode(i);
@@ -307,6 +309,13 @@ public class Solver {
     private static class Move {
         Point p;
         int offsetType;
+        /*
+        Offset Types:
+        1 = Up
+        2 = Down
+        3 = Left
+        4 = Right
+         */
     }
 }
 
