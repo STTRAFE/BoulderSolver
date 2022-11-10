@@ -1,5 +1,7 @@
 package com.strafe;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 
@@ -14,6 +16,7 @@ public class Solver {
     private int solvedPaths = 0;
     private boolean invalidPush;
     private Map<Long, Queue<Move>> cachedRoute;
+    private static Queue cacheMoveList;
 
     public Solver(int [][] solveGrid) {
         this.grid = solveGrid;
@@ -35,18 +38,38 @@ public class Solver {
                     case 1:
                         System.out.println("up" + " " + m.p.x + " " + (m.p.y + 1));
                         ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
+                        try {
+                            ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/up.png"))));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         break;
                     case 2:
                         System.out.println("down" + " " + m.p.x + " " + (m.p.y + 1));
                         ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
+                        try {
+                            ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/down.png"))));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         break;
                     case 3:
                         System.out.println("left" + " " + m.p.x + " " + (m.p.y + 1));
                         ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
+                        try {
+                            ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/left.png"))));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         break;
                     case 4:
                         System.out.println("right" + " " + m.p.x + " " + (m.p.y + 1));
                         ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
+                        try {
+                            ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/right.png"))));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         break;
                     default:
                         break;
@@ -54,6 +77,10 @@ public class Solver {
                 if (moveList.peek()!=null) System.out.println("Next Step:");
             }
         }
+    }
+
+    public Queue getSteps() {
+        return solvedRoute.moveList;
     }
 
 
@@ -98,7 +125,7 @@ public class Solver {
             HashSet<Point> playerLocs = new HashSet<Point>();
             ArrayDeque<Point> pMoves = new ArrayDeque<Point>();
             pMoves.add(start);
-            block1:
+            findPaths:
             while (!pMoves.isEmpty()) { // Iterates through pMoves queue
                 Point loc = (Point) pMoves.poll();
                 if (playerLocs.contains(loc)) continue; // Pulls player location from pMoves and checks if it already existed
@@ -109,7 +136,7 @@ public class Solver {
                         solvedRoutes.add(r);
                         solvedPaths++;
                         pMoves.clear();
-                        continue block1;
+                        continue findPaths;
                     }
                     if (grid[p1.x][p1.y] == 1) continue; // Checks if there is a boulder, if it does not add to possible Moves
                     pMoves.add(p1);
@@ -137,7 +164,7 @@ public class Solver {
         return false;
     }
 
-    private void getValidBoulderPush (Point start, int[][] grid, Set<Point> moves, Route r) {
+    private void getValidBoulderPush(Point start, int[][] grid, Set<Point> moves, Route r) {
         for (Point p : moves) {
             long gridCode;
             int[][] newGrid = copyGrid(grid);
@@ -152,7 +179,7 @@ public class Solver {
         }
     }
 
-    private void pushBoulder (Move move, int[][] grid) {
+    private void pushBoulder(Move move, int[][] grid) {
         int boxX = move.p.x;
         int boxY = move.p.y;
         if (move.offsetType == 1) {
@@ -170,7 +197,7 @@ public class Solver {
         }
     }
 
-    private Move pushBoulder (int playerX, int playerY, int boxX, int boxY, int[][] grid) {
+    private Move pushBoulder(int playerX, int playerY, int boxX, int boxY, int[][] grid) {
         if (grid[boxX][boxY] != 1) {
             return null;
         }
@@ -223,7 +250,7 @@ public class Solver {
         return null;
     }
 
-    private Set<Point> validMoves (Point start) {
+    private Set<Point> validMoves(Point start) {
         HashSet<Point> out = new HashSet<Point>();
         int x = start.x;
         int y = start.y;
@@ -246,16 +273,22 @@ public class Solver {
         return out;
     }
 
-    private int[][] copyGrid (int[][] input) {
+    private int[][] copyGrid(int[][] input) {
         int[][] out = new int[input.length][input[0].length];
         for (int i = 0; i < input.length; ++i) {
             System.arraycopy(input[i], 0, out[i], 0, input[0].length);
         }
-        System.out.println(Arrays.deepToString(input));
+//        System.out.println("============");
+//        for (int i = 0; i < 7; i ++) {
+//            for (int j = 0; j < 7; j++) {
+//                System.out.print(out[i][j] + " ");
+//            }
+//            System.out.println();
+//        }
         return out;
     }
 
-    private long getGridCode (int[][] grid) {
+    private long getGridCode(int[][] grid) {
         long sum = 0L;
         for (int[] i : grid) {
             sum = 7L * sum + (long) Arrays.hashCode(i);
@@ -306,7 +339,7 @@ public class Solver {
         }
     }
 
-    private static class Move {
+    public static class Move {
         Point p;
         int offsetType;
         /*
