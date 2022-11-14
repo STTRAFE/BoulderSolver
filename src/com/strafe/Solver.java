@@ -12,32 +12,29 @@ public class Solver {
     private TreeSet<Route> solvedRoutes;
     private Set<Long> visited;
     private Route solvedRoute;
-    private int time;
-    private int solvedPaths = 0;
-    private boolean invalidPush;
-    private Map<Long, Queue<Move>> cachedRoute;
-    private static Queue cacheMoveList;
+    private final int time;
 
     public Solver(int [][] solveGrid) {
         this.grid = solveGrid;
-        this.routes = new ArrayDeque<Route>();
-        this.solvedRoutes = new TreeSet();
-        this.visited = new HashSet<Long>();
+        this.routes = new ArrayDeque<>();
+        this.solvedRoutes = new TreeSet<>();
+        this.visited = new HashSet<>();
         this.solvedRoute = null;
-        this.invalidPush = true;
-        this.cachedRoute = new HashMap<Long, Queue<Move>>();
         this.time = 5000;
     }
 
     public void showSolution() {
         if (solvedRoute != null) {
+            int stepsNum = 0;
             Queue<Move> moveList = solvedRoute.moveList;
             while (!moveList.isEmpty()) {
                 Move m = moveList.poll();
+                stepsNum++;
+                ButtonGrid.grid[m.p.y][m.p.x-1].setTextOnButton(String.valueOf(stepsNum));
+                ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
                 switch (m.offsetType) {
                     case 1:
-                        System.out.println("up" + " " + m.p.x + " " + (m.p.y + 1));
-                        ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
+//                        System.out.println("up" + " " + m.p.x + " " + (m.p.y + 1));
                         try {
                             ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/up.png"))));
                         } catch (Exception e) {
@@ -45,8 +42,7 @@ public class Solver {
                         }
                         break;
                     case 2:
-                        System.out.println("down" + " " + m.p.x + " " + (m.p.y + 1));
-                        ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
+//                        System.out.println("down" + " " + m.p.x + " " + (m.p.y + 1));
                         try {
                             ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/down.png"))));
                         } catch (Exception e) {
@@ -54,8 +50,7 @@ public class Solver {
                         }
                         break;
                     case 3:
-                        System.out.println("left" + " " + m.p.x + " " + (m.p.y + 1));
-                        ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
+//                        System.out.println("left" + " " + m.p.x + " " + (m.p.y + 1));
                         try {
                             ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/left.png"))));
                         } catch (Exception e) {
@@ -63,8 +58,7 @@ public class Solver {
                         }
                         break;
                     case 4:
-                        System.out.println("right" + " " + m.p.x + " " + (m.p.y + 1));
-                        ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
+//                        System.out.println("right" + " " + m.p.x + " " + (m.p.y + 1));
                         try {
                             ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/right.png"))));
                         } catch (Exception e) {
@@ -74,33 +68,29 @@ public class Solver {
                     default:
                         break;
                 }
-                if (moveList.peek()!=null) System.out.println("Next Step:");
+//                if (moveList.peek()!=null) System.out.println("Next Step:");
             }
         }
     }
 
-    public Queue getSteps() {
+    public Queue<?> getSteps() {
         return solvedRoute.moveList;
     }
 
-
     public boolean solve() {
-        if (!invalidPush) {
-            return true;
-        }
-        routes = new ArrayDeque<Route>();
-        solvedRoutes = new TreeSet();
-        visited = new HashSet<Long>();
-        solvedPaths = 0;
+        routes = new ArrayDeque<>();
+        solvedRoutes = new TreeSet<>();
+        visited = new HashSet<>();
+        int solvedPaths = 0;
         int[][] newGrid = copyGrid(grid);
-
         Route first = new Route();
+
         first.grid = grid;
         first.player = new Point(7, 0); // Initial location
-        routes = new ArrayDeque<Route>();
-        visited = new HashSet<Long>();
+        routes = new ArrayDeque<>();
+        visited = new HashSet<>();
         routes.add(first);
-        solvedRoutes = new TreeSet();
+        solvedRoutes = new TreeSet<>();
         long startTime = System.currentTimeMillis();
         while (!routes.isEmpty()) { // Iterates through possible routes
             long gridCode;
@@ -122,12 +112,12 @@ public class Solver {
                 continue;
             }
             grid = r.grid;
-            HashSet<Point> playerLocs = new HashSet<Point>();
-            ArrayDeque<Point> pMoves = new ArrayDeque<Point>();
+            HashSet<Point> playerLocs = new HashSet<>();
+            ArrayDeque<Point> pMoves = new ArrayDeque<>();
             pMoves.add(start);
             findPaths:
             while (!pMoves.isEmpty()) { // Iterates through pMoves queue
-                Point loc = (Point) pMoves.poll();
+                Point loc = pMoves.poll();
                 if (playerLocs.contains(loc)) continue; // Pulls player location from pMoves and checks if it already existed
                 playerLocs.add(loc);
                 Set<Point> moves = validMoves(loc); // Generates possible moves from location, checks if it is valid
@@ -152,11 +142,10 @@ public class Solver {
                 return false;
             }
             solvedRoute = r;
-            ArrayDeque<Move> cloned = new ArrayDeque<Move>(r.moveList);
+            ArrayDeque<Move> cloned = new ArrayDeque<>(r.moveList);
             while (!cloned.isEmpty()) { // copies the possible moves
-                Move poll = (Move) cloned.poll();
+                Move poll = cloned.poll();
                 pushBoulder(poll, newGrid);
-                cachedRoute.put(getGridCode(newGrid), new ArrayDeque<Move>(cloned));
             }
 //            System.out.println(solvedPaths);
             return true;
@@ -166,10 +155,9 @@ public class Solver {
 
     private void getValidBoulderPush(Point start, int[][] grid, Set<Point> moves, Route r) {
         for (Point p : moves) {
-            long gridCode;
             int[][] newGrid = copyGrid(grid);
             Move push = pushBoulder(start.x, start.y, p.x, p.y, newGrid);
-            if (push == null || visited.contains(gridCode = getGridCode(newGrid))) continue;
+            if (push == null || visited.contains(getGridCode(newGrid))) continue;
             Route r1 = new Route(r);
             r1.moveList.add(push);
             r1.moves++;
@@ -197,52 +185,49 @@ public class Solver {
         }
     }
 
-    private Move pushBoulder(int playerX, int playerY, int boxX, int boxY, int[][] grid) {
-        if (grid[boxX][boxY] != 1) {
-            return null;
-        }
-        if (boxX == 0 || boxX == 7) {
-            return null;
-        }
-        if (boxX - playerX == -1) {
-            if (grid[boxX - 1][boxY] == 0) {
-                grid[boxX - 1][boxY] = 1;
-                grid[boxX][boxY] = 0;
+    private Move pushBoulder(int playerX, int playerY, int boulderX, int boulderY, int[][] grid) {
+
+        if (grid[boulderX][boulderY] != 1 || boulderX == 0 || boulderX == 7) return null;
+
+        if (boulderX - playerX == -1) {
+            if (grid[boulderX - 1][boulderY] == 0) {
+                grid[boulderX - 1][boulderY] = 1;
+                grid[boulderX][boulderY] = 0;
                 Move move = new Move();
-                move.p = new Point(boxX, boxY);
+                move.p = new Point(boulderX, boulderY);
                 move.offsetType = 1;
                 return move;
             }
-        } else if (boxX - playerX == 1) {
-            if (grid[boxX + 1][boxY] == 0) {
-                grid[boxX + 1][boxY] = 1;
-                grid[boxX][boxY] = 0;
+        } else if (boulderX - playerX == 1) {
+            if (grid[boulderX + 1][boulderY] == 0) {
+                grid[boulderX + 1][boulderY] = 1;
+                grid[boulderX][boulderY] = 0;
                 Move move = new Move();
-                move.p = new Point(boxX, boxY);
+                move.p = new Point(boulderX, boulderY);
                 move.offsetType = 2;
                 return move;
             }
-        } else if (boxY - playerY == -1) {
-            if (boxY == 0) {
+        } else if (boulderY - playerY == -1) {
+            if (boulderY == 0) {
                 return null;
             }
-            if (grid[boxX][boxY - 1] == 0) {
-                grid[boxX][boxY - 1] = 1;
-                grid[boxX][boxY] = 0;
+            if (grid[boulderX][boulderY - 1] == 0) {
+                grid[boulderX][boulderY - 1] = 1;
+                grid[boulderX][boulderY] = 0;
                 Move move = new Move();
-                move.p = new Point(boxX, boxY);
+                move.p = new Point(boulderX, boulderY);
                 move.offsetType = 3;
                 return move;
             }
-        } else if (boxY - playerY == 1) {
-            if (boxY == 6) {
+        } else if (boulderY - playerY == 1) {
+            if (boulderY == 6) {
                 return null;
             }
-            if (grid[boxX][boxY + 1] == 0) {
-                grid[boxX][boxY + 1] = 1;
-                grid[boxX][boxY] = 0;
+            if (grid[boulderX][boulderY + 1] == 0) {
+                grid[boulderX][boulderY + 1] = 1;
+                grid[boulderX][boulderY] = 0;
                 Move move = new Move();
-                move.p = new Point(boxX, boxY);
+                move.p = new Point(boulderX, boulderY);
                 move.offsetType = 4;
                 return move;
             }
@@ -251,7 +236,7 @@ public class Solver {
     }
 
     private Set<Point> validMoves(Point start) {
-        HashSet<Point> out = new HashSet<Point>();
+        HashSet<Point> out = new HashSet<>();
         int x = start.x;
         int y = start.y;
         if (y > 0 && y < 6) {
@@ -274,18 +259,11 @@ public class Solver {
     }
 
     private int[][] copyGrid(int[][] input) {
-        int[][] out = new int[input.length][input[0].length];
+        int[][] gridCopy = new int[input.length][input[0].length];
         for (int i = 0; i < input.length; ++i) {
-            System.arraycopy(input[i], 0, out[i], 0, input[0].length);
+            System.arraycopy(input[i], 0, gridCopy[i], 0, input[0].length);
         }
-//        System.out.println("============");
-//        for (int i = 0; i < 7; i ++) {
-//            for (int j = 0; j < 7; j++) {
-//                System.out.print(out[i][j] + " ");
-//            }
-//            System.out.println();
-//        }
-        return out;
+        return gridCopy;
     }
 
     private long getGridCode(int[][] grid) {
@@ -297,32 +275,27 @@ public class Solver {
     }
 
     private static class Route implements Comparable<Route> {
-        int[][] grid;
-        Point player;
-        Queue<Move> moveList = new ArrayDeque<Move>();
-        int moves = 0;
+        private int[][] grid;
+        private Point player;
+        private Queue<Move> moveList;
+        private int moves;
 
         Route() {
-            this.moveList = new ArrayDeque<Move>();
+            this.moveList = new ArrayDeque<>();
             this.moves = 0;
         }
 
         Route(Route r) {
             this.grid = r.grid;
             this.player = r.player;
-            this.moveList = new ArrayDeque<Move>(r.moveList);
+            this.moveList = new ArrayDeque<>(r.moveList);
             this.moves = r.moves;
         }
 
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof Route)) {
-                return false;
-            }
-            Route route = (Route) o;
-            return Arrays.equals((Object[]) this.grid, (Object[]) route.grid);
+            if (this == o) return true;
+            if (!(o instanceof Route)) return false;
+            return Arrays.deepEquals(this.grid, ((Route) o).grid);
         }
 
         public int hashCode() {

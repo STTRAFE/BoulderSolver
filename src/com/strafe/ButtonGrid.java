@@ -9,16 +9,17 @@ import java.util.Queue;
 
 public class ButtonGrid extends JPanel implements ActionListener {
 
-    private static final int SIZE = 100, BORDER = 1;
+    private static final int BORDER = 1;
     public static BoulderButtons[][] grid;
     public static int[][] gridToSolve = new int [8][7];
-    private JButton solveButton = new JButton("Solve");
-    private JButton hintsButton = new JButton("Hints");
-    private JButton historyButton = new JButton("History");
-    private JButton resetButton = new JButton("Reset");
+    private final JButton solveButton = new JButton("Solve");
+    private final JButton hintsButton = new JButton("Hints");
+    private final JButton historyButton = new JButton("History");
+    private final JButton resetButton = new JButton("Reset");
     private int ROWS;
     private int COL;
-    private Queue steps;
+    private Queue<?> steps;
+    private static int stepsNum = 0;
 
     public ButtonGrid(int r,int c) {
         setLayout(new GridLayout(r,c, BORDER, BORDER));
@@ -28,12 +29,6 @@ public class ButtonGrid extends JPanel implements ActionListener {
         COL = c;
 
         grid = new BoulderButtons[ROWS][COL]; //allocate grid
-
-//        for (int i=0; i<COL; i++) {
-//            JButton finishLine = new JButton();
-//            finishLine.setBackground(Color.GREEN);
-//            add(finishLine);
-//        }
 
         for(int cc=0; cc<COL; cc++){
             for(int rr=0; rr<ROWS; rr++){
@@ -101,37 +96,41 @@ public class ButtonGrid extends JPanel implements ActionListener {
                 if (steps == null) steps = solve.getSteps();
                 if (!steps.isEmpty()) {
                     Solver.Move m = (Solver.Move) steps.poll();
+                    stepsNum++;
+                    ButtonGrid.grid[m.p.y][m.p.x-1].setTextOnButton(String.valueOf(stepsNum));
                     switch (m.offsetType) {
                         case 1:
                             System.out.println("up" + " " + m.p.x + " " + (m.p.y + 1));
-//                            ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
                             try {
                                 ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/up.png"))));
                             } catch (Exception k) {
+                                k.printStackTrace();
                             }
                             break;
                         case 2:
                             System.out.println("down" + " " + m.p.x + " " + (m.p.y + 1));
-//                            ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
+
                             try {
                                 ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/down.png"))));
                             } catch (Exception k) {
+                                k.printStackTrace();
                             }
                             break;
                         case 3:
                             System.out.println("left" + " " + m.p.x + " " + (m.p.y + 1));
-//                            ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
                             try {
                                 ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/left.png"))));
                             } catch (Exception k) {
+                                k.printStackTrace();
                             }
                             break;
                         case 4:
                             System.out.println("right" + " " + m.p.x + " " + (m.p.y + 1));
-//                            ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
+
                             try {
                                 ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/right.png"))));
                             } catch (Exception k) {
+                                k.printStackTrace();
                             }
                             break;
                         default:
@@ -140,6 +139,7 @@ public class ButtonGrid extends JPanel implements ActionListener {
                 } else {
                     JOptionPane.showMessageDialog(this,"All steps displayed");
                     steps = null;
+                    stepsNum = 0;
                 }
             }
 
@@ -163,11 +163,13 @@ public class ButtonGrid extends JPanel implements ActionListener {
     }
 
     public void resetGrid() {
+        stepsNum = 0;
         for (int y = 0; y < COL; y++) {
             for (int x = 0; x < ROWS; x++) {
                 grid[x][y].setColor(Color.WHITE);
                 grid[x][y].setIcon((Icon) null);
                 grid[x][y].setPressed(false);
+                grid[x][y].setTextOnButton(null);
             }
         }
     }
@@ -176,6 +178,7 @@ public class ButtonGrid extends JPanel implements ActionListener {
         for (int y = 0; y < COL; y++) {
             for (int x = 0; x < ROWS; x++) {
                 grid[x][y].setIcon((Icon) null);
+                grid[x][y].setTextOnButton(null);
                 if (grid[x][y].isPressed()) grid[x][y].setColor(Color.RED);
             }
         }

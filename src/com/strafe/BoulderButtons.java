@@ -39,6 +39,10 @@ public class BoulderButtons extends JButton implements ActionListener {
         this.setIcon(img);
     }
 
+    public void setTextOnButton(String s) {
+        this.setText(s);
+    }
+
     @Override
     public Dimension getPreferredSize() {
         Dimension d = super.getPreferredSize();
