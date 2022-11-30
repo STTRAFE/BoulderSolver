@@ -3,6 +3,7 @@ package com.strafe;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,11 +29,11 @@ public class SaveLoad {
     public static void save(int [][] grid, int steps, int ROWS) {
         ArrayList<String> toSave = new ArrayList<>();
 
-        toSave.add("BOULDER:" + steps + ":");
-
-       for (int i = 0; i < ROWS; i ++) {
+        for (int i = 0; i < ROWS; i ++) {
            toSave.add(Arrays.toString(grid[i+1]));
-       }
+        }
+
+        toSave.add("BOULDER:" + steps + ":");
 
         try {
             PrintWriter pw = new PrintWriter(new FileWriter(dataFile,true));
@@ -47,6 +48,7 @@ public class SaveLoad {
 
     public static void load() {
         int n = -1;
+        int x = 6;
         boolean full = false;
         ArrayList<String> lines = new ArrayList<>();
         try {
@@ -58,11 +60,14 @@ public class SaveLoad {
             }
             reader.close();
         } catch (Exception e) {
+            System.out.println("File does not exist, save some data first..");
             e.printStackTrace();
         }
 
+        if (!lines.isEmpty()) Collections.reverse(lines);
+
         for (String s : lines) {
-            int x = 0;
+            if (full) break;
             if (s.startsWith("BOULDER")) {
                 String[] args = s.split(":");
                 if (n >= 3) {
@@ -72,12 +77,12 @@ public class SaveLoad {
                     System.out.println("Creating new grid object");
                     n++;
                     historicGrids[n] = new HistoricGrid();
-                    x = 0;
+                    x = 6;
                 }
                 historicGrids[n].setSteps(Integer.parseInt(args[1]));
             }
 
-            if (s.startsWith("[") && !full) {
+            if (s.startsWith("[")) {
                 Matcher m = p.matcher(s);
                 if (m.find()) {
                     historicGrids[n].setGrid(Integer.parseInt(m.group(1)),x,0);
@@ -87,17 +92,23 @@ public class SaveLoad {
                     historicGrids[n].setGrid(Integer.parseInt(m.group(5)),x,4);
                     historicGrids[n].setGrid(Integer.parseInt(m.group(6)),x,5);
                     historicGrids[n].setGrid(Integer.parseInt(m.group(7)),x,6);
-                    x++;
+                    x--;
                 } else {
                     System.out.println("No match found");
                 }
             }
         }
 
-        System.out.println(historicGrids[0].getGrid()[1][6]);
-        System.out.println(historicGrids[0].getSteps());
-        System.out.println(Arrays.deepToString(historicGrids[1].getGrid()));
-        System.out.println(Arrays.deepToString(historicGrids[2].getGrid()));
-        System.out.println(Arrays.deepToString(historicGrids[3].getGrid()));
+        for (int p = 0; p < 4; p ++) {
+            System.out.println("==History " + p + " ==");
+            for (int k = 0; k < 7; k++) {
+                for (int j = 0; j < 7; j++) {
+                    System.out.print(historicGrids[p].getGrid()[k][j]);
+                }
+                System.out.println();
+            }
+            System.out.println("==Steps " + historicGrids[p].getSteps() + " ==");
+        }
+
     }
 }
