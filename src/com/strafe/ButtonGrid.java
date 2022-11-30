@@ -16,10 +16,13 @@ public class ButtonGrid extends JPanel implements ActionListener {
     private final JButton hintsButton = new JButton("Hints");
     private final JButton historyButton = new JButton("History");
     private final JButton resetButton = new JButton("Reset");
-    private int ROWS;
-    private int COL;
+    private final JButton trackerButton = new JButton("I Solved It!");
+    private static int ROWS;
+    private static int COL;
     private Queue<?> steps;
+    private int hintsUsed;
     private static int stepsNum = 0;
+    private static boolean allHintsDisplayed = false;
 
     public ButtonGrid(int r,int c) {
         setLayout(new GridLayout(r,c, BORDER, BORDER));
@@ -50,16 +53,20 @@ public class ButtonGrid extends JPanel implements ActionListener {
         hintsButton.setBounds(150,10,200,40);
         historyButton.setBounds(150,10,200,40);
         resetButton.setBounds(150,10,200,40);
+        trackerButton.setBounds(150,30,400,40);
 
         f.add(solveButton);
         f.add(hintsButton);
         f.add(historyButton);
         f.add(resetButton);
+        f.add(trackerButton);
+
 
         solveButton.addActionListener(this);
         hintsButton.addActionListener(this);
         historyButton.addActionListener(this);
         resetButton.addActionListener(this);
+        trackerButton.addActionListener(this);
 
         f.pack();
         f.setVisible(true);
@@ -68,6 +75,7 @@ public class ButtonGrid extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == solveButton) {
+            hintsUsed = -1;
             removeButtonSettings();
             inputGrid();
 //            System.out.println("================");
@@ -90,13 +98,16 @@ public class ButtonGrid extends JPanel implements ActionListener {
                 JOptionPane.showMessageDialog(this,"No Solution");
             }
         } else if (e.getSource() == hintsButton) {
+            if (!boardUpdated(gridToSolve) && allHintsDisplayed) return;
             inputGrid();
+            allHintsDisplayed = false;
             Solver solve = new Solver(gridToSolve);
             if (solve.solve()) {
                 if (steps == null) steps = solve.getSteps();
                 if (!steps.isEmpty()) {
                     Solver.Move m = (Solver.Move) steps.poll();
                     stepsNum++;
+                    if (hintsUsed != -1) hintsUsed = stepsNum;
                     ButtonGrid.grid[m.p.y][m.p.x-1].setTextOnButton(String.valueOf(stepsNum));
                     switch (m.offsetType) {
                         case 1:
@@ -140,13 +151,23 @@ public class ButtonGrid extends JPanel implements ActionListener {
                     JOptionPane.showMessageDialog(this,"All steps displayed");
                     steps = null;
                     stepsNum = 0;
+                    allHintsDisplayed = true;
+                    removeButtonSettings();
                 }
+            } else {
+                JOptionPane.showMessageDialog(this,"No Solution");
             }
 
         } else if(e.getSource() == historyButton) {
             System.out.println("history");
+            SaveLoad.load();
         } else if (e.getSource() == resetButton) {
             resetGrid();
+
+        } else if (e.getSource() == trackerButton) {
+            inputGrid();
+            System.out.println(hintsUsed);
+            SaveLoad.saveLoad(gridToSolve,hintsUsed,ROWS);
         }
     }
 
@@ -164,6 +185,7 @@ public class ButtonGrid extends JPanel implements ActionListener {
 
     public void resetGrid() {
         stepsNum = 0;
+        hintsUsed = 0;
         for (int y = 0; y < COL; y++) {
             for (int x = 0; x < ROWS; x++) {
                 grid[x][y].setColor(Color.WHITE);
@@ -182,5 +204,18 @@ public class ButtonGrid extends JPanel implements ActionListener {
                 if (grid[x][y].isPressed()) grid[x][y].setColor(Color.RED);
             }
         }
+    }
+
+    private boolean boardUpdated(int [][] g) {
+        for (int y = 0; y < COL; y++) {
+            for (int x = 0; x < ROWS; x++) {
+                if (grid[x][y].isPressed()) {
+                    if (g[y+1][x] != 1) return true;
+                } else {
+                    if (g[y+1][x] != 0) return true;
+                }
+            }
+        }
+        return false;
     }
 }

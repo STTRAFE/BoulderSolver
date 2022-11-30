@@ -46,7 +46,7 @@ public class BoulderButtons extends JButton implements ActionListener {
     @Override
     public Dimension getPreferredSize() {
         Dimension d = super.getPreferredSize();
-        int s = (int)(d.getWidth()<d.getHeight() ? d.getHeight() : d.getWidth());
+        int s = (int)(Math.max(d.getWidth(), d.getHeight()));
         return new Dimension (s,s);
     }
 
