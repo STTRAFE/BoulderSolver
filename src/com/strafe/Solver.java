@@ -251,7 +251,7 @@ public class Solver {
         } else if (x == 7) {
             out.add(new Point(x - 1, y));
         }
-        System.out.println(out);
+//        System.out.println(out);
         return out;
     }
 

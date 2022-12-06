@@ -17,6 +17,9 @@ public class ButtonGrid extends JPanel implements ActionListener {
     private final JButton historyButton = new JButton("History");
     private final JButton resetButton = new JButton("Reset");
     private final JButton trackerButton = new JButton("I Solved It!");
+    private final JButton backButton = new JButton("Back");
+    private JFrame main = new JFrame("Boulder Solver");
+    private JFrame history = new JFrame("History");
     private static int ROWS;
     private static int COL;
     private Queue<?> steps;
@@ -43,10 +46,10 @@ public class ButtonGrid extends JPanel implements ActionListener {
     }
 
     public void initBoard() {
-        JFrame f = new JFrame("Boulder Solver");
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setLayout(new GridBagLayout());
-        f.add(this);
+        main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        main.setLayout(new GridBagLayout());
+        main.add(this);
+        main.setSize(900,600);
 //        f.getContentPane().add(new RenderUtils());
 
         solveButton.setBounds(150,10,200,40);
@@ -55,11 +58,13 @@ public class ButtonGrid extends JPanel implements ActionListener {
         resetButton.setBounds(150,10,200,40);
         trackerButton.setBounds(150,30,400,40);
 
-        f.add(solveButton);
-        f.add(hintsButton);
-        f.add(historyButton);
-        f.add(resetButton);
-        f.add(trackerButton);
+        JPanel buttons = new JPanel();
+        buttons.add(solveButton);
+        buttons.add(hintsButton);
+        buttons.add(historyButton);
+        buttons.add(resetButton);
+        buttons.add(trackerButton);
+        main.add(buttons);
 
 
         solveButton.addActionListener(this);
@@ -68,8 +73,28 @@ public class ButtonGrid extends JPanel implements ActionListener {
         resetButton.addActionListener(this);
         trackerButton.addActionListener(this);
 
-        f.pack();
-        f.setVisible(true);
+        main.setVisible(true);
+    }
+
+    public void historyFrame() {
+        main.setVisible(false);
+        history.setVisible(true);
+        history.setLayout(new GridLayout(ROWS,COL, BORDER, BORDER));
+
+        history.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        history.setSize(900,600);
+
+        backButton.setBounds(150,30,400,40);
+        backButton.addActionListener(this);
+
+        HistoricGrid[] g = SaveLoad.load();
+        JLabel e = new JLabel();
+        e.setName("steps 0: " + g[0].getSteps());
+        e.setBounds(150,30,400,40);
+        e.setVisible(true);
+
+        history.add(e);
+        history.add(backButton);
     }
 
     @Override
@@ -155,15 +180,16 @@ public class ButtonGrid extends JPanel implements ActionListener {
             }
 
         } else if(e.getSource() == historyButton) {
-            System.out.println("history");
-            SaveLoad.load();
+            historyFrame();
         } else if (e.getSource() == resetButton) {
             resetGrid();
-
         } else if (e.getSource() == trackerButton) {
             inputGrid();
             System.out.println(hintsUsed);
             SaveLoad.saveLoad(gridToSolve,hintsUsed,ROWS);
+        } else if (e.getSource() == backButton) {
+            main.setVisible(true);
+            history.setVisible(false);
         }
     }
 

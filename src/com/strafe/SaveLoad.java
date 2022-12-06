@@ -46,7 +46,7 @@ public class SaveLoad {
         }
     }
 
-    public static void load() {
+    public static HistoricGrid[] load() {
         int n = -1;
         int x = 6;
         boolean full = false;
@@ -110,5 +110,6 @@ public class SaveLoad {
             System.out.println("==Steps " + historicGrids[p].getSteps() + " ==");
         }
 
+        return historicGrids;
     }
 }
