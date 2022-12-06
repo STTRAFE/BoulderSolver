@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class SaveLoad {
 
-    private static File dataFile = new File(new File(System.getProperty("user.dir"), "boulder"), "BoulderData.txt");
+    private static final File dataFile = new File(new File(System.getProperty("user.dir"), "boulder"), "BoulderData.txt");
     public static HistoricGrid[] historicGrids = new HistoricGrid[6];
     private static final Pattern p  = Pattern.compile("([0,1]), ([0-1]), ([0-1]), ([0-1]), ([0-1]), ([0-1]), ([0-1])");
 

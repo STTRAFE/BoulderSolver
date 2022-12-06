@@ -110,42 +110,38 @@ public class ButtonGrid extends JPanel implements ActionListener {
                     if (hintsUsed != -1) hintsUsed = stepsNum;
                     ButtonGrid.grid[m.p.y][m.p.x-1].setTextOnButton(String.valueOf(stepsNum));
                     switch (m.offsetType) {
-                        case 1:
+                        case 1 -> {
                             System.out.println("up" + " " + m.p.x + " " + (m.p.y + 1));
                             try {
-                                ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/up.png"))));
+                                ButtonGrid.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/up.png"))));
                             } catch (Exception k) {
                                 k.printStackTrace();
                             }
-                            break;
-                        case 2:
+                        }
+                        case 2 -> {
                             System.out.println("down" + " " + m.p.x + " " + (m.p.y + 1));
-
                             try {
-                                ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/down.png"))));
+                                ButtonGrid.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/down.png"))));
                             } catch (Exception k) {
                                 k.printStackTrace();
                             }
-                            break;
-                        case 3:
+                        }
+                        case 3 -> {
                             System.out.println("left" + " " + m.p.x + " " + (m.p.y + 1));
                             try {
-                                ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/left.png"))));
+                                ButtonGrid.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/left.png"))));
                             } catch (Exception k) {
                                 k.printStackTrace();
                             }
-                            break;
-                        case 4:
+                        }
+                        case 4 -> {
                             System.out.println("right" + " " + m.p.x + " " + (m.p.y + 1));
-
                             try {
-                                ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/right.png"))));
+                                ButtonGrid.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/right.png"))));
                             } catch (Exception k) {
                                 k.printStackTrace();
                             }
-                            break;
-                        default:
-                            break;
+                        }
                     }
                 } else {
                     JOptionPane.showMessageDialog(this,"All steps displayed");
@@ -186,12 +182,13 @@ public class ButtonGrid extends JPanel implements ActionListener {
     public void resetGrid() {
         stepsNum = 0;
         hintsUsed = 0;
-        for (int y = 0; y < COL; y++) {
+        for (int y = 0; y < COL-1; y++) {
             for (int x = 0; x < ROWS; x++) {
                 grid[x][y].setColor(Color.WHITE);
                 grid[x][y].setIcon((Icon) null);
                 grid[x][y].setPressed(false);
                 grid[x][y].setTextOnButton(null);
+                if (y == 0) grid[x][y].setColor(Color.green);
             }
         }
     }

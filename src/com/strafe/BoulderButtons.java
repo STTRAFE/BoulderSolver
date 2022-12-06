@@ -12,6 +12,7 @@ public class BoulderButtons extends JButton implements ActionListener {
     private boolean pressed = false;
 
     public BoulderButtons(int x, int y) {
+        this.setPreferredSize(new Dimension(60,60));
         this.setBackground(Color.WHITE);
         this.addActionListener(this);
         this.x = x;
@@ -21,6 +22,7 @@ public class BoulderButtons extends JButton implements ActionListener {
         if (this.y == 6) this.setBackground(Color.gray);
         if (this.x == 0 && this.y == 6) this.setBackground(Color.black);
         if (this.y == 0) this.setBackground(Color.green);
+//        this.setTextOnButton((y+1) + "," + x);
     }
 
     public boolean isPressed() {
@@ -41,13 +43,6 @@ public class BoulderButtons extends JButton implements ActionListener {
 
     public void setTextOnButton(String s) {
         this.setText(s);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        Dimension d = super.getPreferredSize();
-        int s = (int)(Math.max(d.getWidth(), d.getHeight()));
-        return new Dimension (s,s);
     }
 
     @Override

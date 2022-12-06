@@ -12,7 +12,6 @@ public class Solver {
     private TreeSet<Route> solvedRoutes;
     private Set<Long> visited;
     private Route solvedRoute;
-    private final int time;
 
     public Solver(int [][] solveGrid) {
         this.grid = solveGrid;
@@ -20,7 +19,6 @@ public class Solver {
         this.solvedRoutes = new TreeSet<>();
         this.visited = new HashSet<>();
         this.solvedRoute = null;
-        this.time = 5000;
     }
 
     public void showSolution() {
@@ -78,37 +76,31 @@ public class Solver {
     }
 
     public boolean solve() {
-        routes = new ArrayDeque<>();
-        solvedRoutes = new TreeSet<>();
-        visited = new HashSet<>();
-        int solvedPaths = 0;
+        int solutions = 0;
         int[][] newGrid = copyGrid(grid);
-        Route first = new Route();
 
-        first.grid = grid;
-        first.player = new Point(7, 0); // Initial location
-        routes = new ArrayDeque<>();
-        visited = new HashSet<>();
-        routes.add(first);
         solvedRoutes = new TreeSet<>();
-        long startTime = System.currentTimeMillis();
-        while (!routes.isEmpty()) { // Iterates through possible routes
+        visited = new HashSet<>();
+        Route initial = new Route();
+
+        initial.grid = grid;
+        initial.player = new Point(7, 0); // Initial location
+        routes.add(initial); //root node
+
+        while (!routes.isEmpty()) {
+//            System.out.println(routes.peek().moves + " " + routes.peek().player);
             long gridCode;
-            if (System.currentTimeMillis() - startTime > (long) time) { // Returns no solution after certain time period
-                if (solvedPaths != 0) break;
-                return false;
-            }
-            if (solvedPaths > 5) break; // Prevents more than 5 solutions from created
-            Route r = routes.poll();
+            if (solutions > 5) break; // Prevents more than 5 solutions from created
+            Route r = routes.poll(); // already visited
             if (r == null || visited.contains(gridCode = getGridCode(r.grid))) continue;
             visited.add(gridCode);
             /*
              A code is generated based off the grid, then checked against the list of visited locations
             */
             Point start = r.player;
-            if (start.x == 0) { // If route ends at top, adds to solved paths
-                solvedRoutes.add(r);
-                solvedPaths++;
+            if (start.x == 0) { // Stops searching once it reaches goal
+                solvedRoutes.add(r); //Adds path to solvedRoutes treeset
+                solutions++;
                 continue;
             }
             grid = r.grid;
@@ -121,10 +113,10 @@ public class Solver {
                 if (playerLocs.contains(loc)) continue; // Pulls player location from pMoves and checks if it already existed
                 playerLocs.add(loc);
                 Set<Point> moves = validMoves(loc); // Generates possible moves from location, checks if it is valid
-                for (Point p1 : moves) { // Iterates through every valid move
+                for (Point p1 : moves) {
                     if (p1.x == 0) { // Check if it reaches finishing line (x=0)
                         solvedRoutes.add(r);
-                        solvedPaths++;
+                        solutions++;
                         pMoves.clear();
                         continue findPaths;
                     }
@@ -136,7 +128,7 @@ public class Solver {
                 getValidBoulderPush(p, grid, validMoves(p), r); // Checks if there is a valid boulder movement
             }
         }
-        if (solvedPaths != 0) {
+        if (solutions != 0) {
             Route r = solvedRoutes.pollFirst();
             if (r == null) { // Catching error
                 return false;
@@ -147,7 +139,6 @@ public class Solver {
                 Move poll = cloned.poll();
                 pushBoulder(poll, newGrid);
             }
-//            System.out.println(solvedPaths);
             return true;
         }
         return false;
@@ -158,30 +149,35 @@ public class Solver {
             int[][] newGrid = copyGrid(grid);
             Move push = pushBoulder(start.x, start.y, p.x, p.y, newGrid);
             if (push == null || visited.contains(getGridCode(newGrid))) continue;
-            Route r1 = new Route(r);
-            r1.moveList.add(push);
-            r1.moves++;
-            r1.grid = newGrid;
-            r1.player = push.p;
-            routes.add(r1);
+            Route move = new Route(r);
+            move.moveList.add(push);
+            move.moves++;
+            move.grid = newGrid;
+            move.player = push.p;
+            routes.add(move);
         }
     }
 
     private void pushBoulder(Move move, int[][] grid) {
-        int boxX = move.p.x;
-        int boxY = move.p.y;
-        if (move.offsetType == 1) {
-            grid[boxX - 1][boxY] = 1;
-            grid[boxX][boxY] = 0;
-        } else if (move.offsetType == 2) {
-            grid[boxX + 1][boxY] = 1;
-            grid[boxX][boxY] = 0;
-        } else if (move.offsetType == 3) {
-            grid[boxX][boxY - 1] = 1;
-            grid[boxX][boxY] = 0;
-        } else if (move.offsetType == 4) {
-            grid[boxX][boxY + 1] = 1;
-            grid[boxX][boxY] = 0;
+        int x = move.p.x;
+        int y = move.p.y;
+        switch (move.offsetType) {
+            case 1 -> {
+                grid[x - 1][y] = 1;
+                grid[x][y] = 0;
+            }
+            case 2 -> {
+                grid[x + 1][y] = 1;
+                grid[x][y] = 0;
+            }
+            case 3 -> {
+                grid[x][y - 1] = 1;
+                grid[x][y] = 0;
+            }
+            case 4 -> {
+                grid[x][y + 1] = 1;
+                grid[x][y] = 0;
+            }
         }
     }
 
@@ -255,15 +251,16 @@ public class Solver {
         } else if (x == 7) {
             out.add(new Point(x - 1, y));
         }
+        System.out.println(out);
         return out;
     }
 
-    private int[][] copyGrid(int[][] input) {
-        int[][] gridCopy = new int[input.length][input[0].length];
-        for (int i = 0; i < input.length; ++i) {
-            System.arraycopy(input[i], 0, gridCopy[i], 0, input[0].length);
+    private int[][] copyGrid(int[][] g) {
+        int[][] grid = new int[g.length][g[0].length];
+        for (int i = 0; i < g.length; ++i) {
+            System.arraycopy(g[i], 0, grid[i], 0, g[0].length);
         }
-        return gridCopy;
+        return grid;
     }
 
     private long getGridCode(int[][] grid) {
@@ -275,9 +272,9 @@ public class Solver {
     }
 
     private static class Route implements Comparable<Route> {
-        private int[][] grid;
         private Point player;
         private Queue<Move> moveList;
+        private int[][] grid;
         private int moves;
 
         Route() {
@@ -292,23 +289,9 @@ public class Solver {
             this.moves = r.moves;
         }
 
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Route)) return false;
-            return Arrays.deepEquals(this.grid, ((Route) o).grid);
-        }
-
-        public int hashCode() {
-            int sum = 0;
-            for (int[] i : this.grid) {
-                sum = 31 * sum + Arrays.hashCode(i);
-            }
-            return sum;
-        }
-
         @Override
-        public int compareTo(Route o) {
-            return this.moves - o.moves;
+        public int compareTo(Route r) {
+            return this.moves - r.moves;
         }
     }
 

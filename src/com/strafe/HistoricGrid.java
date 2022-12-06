@@ -1,7 +1,5 @@
 package com.strafe;
 
-import java.util.Arrays;
-
 public class HistoricGrid {
     private int steps;
     private int[][] grid = new int [8][7];
