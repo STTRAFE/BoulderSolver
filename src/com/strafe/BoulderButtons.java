@@ -10,6 +10,7 @@ public class BoulderButtons extends JButton implements ActionListener {
     private int x;
     private int y;
     private boolean pressed = false;
+    private boolean canInteract = true;
 
     public BoulderButtons(int x, int y) {
         this.setPreferredSize(new Dimension(60,60));
@@ -33,6 +34,11 @@ public class BoulderButtons extends JButton implements ActionListener {
         this.pressed = b;
     }
 
+    public void historyBoardConfig(int size, boolean b) {
+        this.setPreferredSize(new Dimension(size,size));
+        canInteract = false;
+    }
+
     public void setColor(Color c) {
         this.setBackground(c);
     }
@@ -47,6 +53,7 @@ public class BoulderButtons extends JButton implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (!canInteract) return;
         if (!pressed && this.y != 6 && this.y!= 0) {
             this.setBackground(Color.RED);
             this.setOpaque(true);

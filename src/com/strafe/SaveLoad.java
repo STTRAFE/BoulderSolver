@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class SaveLoad {
 
     private static final File dataFile = new File(new File(System.getProperty("user.dir"), "boulder"), "BoulderData.txt");
-    public static HistoricGrid[] historicGrids = new HistoricGrid[6];
+    public static HistoricGrid[] historicGrids = new HistoricGrid[4];
     private static final Pattern p  = Pattern.compile("([0,1]), ([0-1]), ([0-1]), ([0-1]), ([0-1]), ([0-1]), ([0-1])");
 
     public static void saveLoad(int [][] grid, int steps, int ROWS) {
@@ -70,7 +70,7 @@ public class SaveLoad {
             if (full) break;
             if (s.startsWith("BOULDER")) {
                 String[] args = s.split(":");
-                if (n >= 3) {
+                if (n > 3) {
                     System.out.println("full 4");
                     full = true;
                 } else {
@@ -81,7 +81,7 @@ public class SaveLoad {
                 }
                 historicGrids[n].setSteps(Integer.parseInt(args[1]));
             }
-
+            if (n == -1) break;
             if (s.startsWith("[")) {
                 Matcher m = p.matcher(s);
                 if (m.find()) {
@@ -99,16 +99,16 @@ public class SaveLoad {
             }
         }
 
-        for (int p = 0; p < 4; p ++) {
-            System.out.println("==History " + p + " ==");
-            for (int k = 0; k < 7; k++) {
-                for (int j = 0; j < 7; j++) {
-                    System.out.print(historicGrids[p].getGrid()[k][j]);
-                }
-                System.out.println();
-            }
-            System.out.println("==Steps " + historicGrids[p].getSteps() + " ==");
-        }
+//        for (int p = 0; p < 4; p ++) {
+//            System.out.println("==History " + p + " ==");
+//            for (int k = 0; k < 7; k++) {
+//                for (int j = 0; j < 7; j++) {
+//                    System.out.print(historicGrids[p].getGrid()[k][j]);
+//                }
+//                System.out.println();
+//            }
+//            System.out.println("==Steps " + historicGrids[p].getSteps() + " ==");
+//        }
 
         return historicGrids;
     }
