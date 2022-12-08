@@ -18,8 +18,16 @@ public class ButtonGrid extends JPanel implements ActionListener {
     private final JButton resetButton = new JButton("Reset");
     private final JButton trackerButton = new JButton("I Solved It!");
     private final JButton backButton = new JButton("Back");
-    private JFrame main = new JFrame("Boulder Solver");
-    private JFrame history = new JFrame("History");
+    private final JLabel l1 = new JLabel("Steps: ");
+    private final JLabel l2 = new JLabel("Steps: ");
+    private final JLabel l3 = new JLabel("Steps: ");
+    private final JLabel l4 = new JLabel("Steps: ");
+    private final JPanel hp1 = new JPanel();
+    private final JPanel hp2 = new JPanel();
+    private final JPanel hp3 = new JPanel();
+    private final JPanel hp4 = new JPanel();
+    private final JFrame main = new JFrame("Boulder Solver");
+    private final JFrame history = new JFrame("History");
     private static int ROWS;
     private static int COL;
     private Queue<?> steps;
@@ -55,7 +63,8 @@ public class ButtonGrid extends JPanel implements ActionListener {
         main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         main.setLayout(new GridBagLayout());
         main.add(this);
-        main.setSize(730,480);
+//        main.setSize(730,480);
+        main.setSize(900,600);
         main.setResizable(false);
 
         solveButton.setBounds(150,10,200,40);
@@ -88,36 +97,52 @@ public class ButtonGrid extends JPanel implements ActionListener {
         history.setLayout(new GridLayout());
         history.setResizable(false);
         history.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        history.setSize(730,480);
+//        history.setSize(730,480);
+        history.setSize(900,600);
 
         backButton.setBounds(620,400,100,40);
         backButton.addActionListener(this);
-
-        HistoricGrid[] g = SaveLoad.load();
-        JLabel l1 = new JLabel("Steps: ");
-        JLabel l2 = new JLabel("Steps: ");
-        JLabel l3 = new JLabel("Steps: ");
-        JLabel l4 = new JLabel("Steps: ");
-        try {
-            l1.setText("Steps: " + g[0].getSteps());
-            l2.setText("Steps: " + g[1].getSteps());
-            l3.setText("Steps: " + g[2].getSteps());
-            l4.setText("Steps: " + g[3].getSteps());
-        } catch (Exception e) {}
 
         l1.setBounds(300,10,400,40);
         l2.setBounds(300,250,400,40);
         l3.setBounds(650,10,400,40);
         l4.setBounds(650,250,400,40);
 
-        JPanel hp1 = new JPanel();
-        JPanel hp2 = new JPanel();
-        JPanel hp3 = new JPanel();
-        JPanel hp4 = new JPanel();
         hp1.setLayout(new GridLayout(7,7, BORDER, BORDER));
         hp2.setLayout(new GridLayout(7,7, BORDER, BORDER));
         hp3.setLayout(new GridLayout(7,7, BORDER, BORDER));
         hp4.setLayout(new GridLayout(7,7, BORDER, BORDER));
+        historyDisplay();
+
+        history.add(hp1);
+        history.add(l1);
+        history.add(hp2);
+        history.add(l2);
+        history.add(hp3);
+        history.add(l3);
+        history.add(hp4);
+        history.add(l4);
+        history.add(backButton);
+    }
+
+    public void historyDisplay() {
+
+        HistoricGrid[] g = SaveLoad.load();
+        try {
+            if (g[0].getSteps() == -1) {
+                l1.setText("Used Solver");
+            } else l1.setText("Steps: " + g[0].getSteps());
+            if (g[1].getSteps() == -1) {
+                l2.setText("Used Solver");
+            } else l2.setText("Steps: " + g[1].getSteps());
+            if (g[2].getSteps() == -1) {
+                l3.setText("Used Solver");
+            } else l3.setText("Steps: " + g[2].getSteps());
+            if (g[3].getSteps() == -1) {
+                l4.setText("Used Solver");
+            } else l4.setText("Steps: " + g[3].getSteps());
+
+        } catch (Exception ignored) {}
 
         BoulderButtons[][] grid1 = new BoulderButtons[7][7];
         BoulderButtons[][] grid2 = new BoulderButtons[7][7];
@@ -137,20 +162,20 @@ public class ButtonGrid extends JPanel implements ActionListener {
                 grid4[rr][cc].historyBoardConfig(10,false);
 
                 try {
-                    int g1[][] = g[0].getGrid();
-                    int g2[][] = g[1].getGrid();
-                    int g3[][] = g[2].getGrid();
-                    int g4[][] = g[3].getGrid();
-                    if (g1[rr][cc] == 1) {
+                    int[][] g1 = g[0].getGrid();
+                    int[][] g2 = g[1].getGrid();
+                    int[][] g3 = g[2].getGrid();
+                    int[][] g4 = g[3].getGrid();
+                    if (g1[cc][rr] == 1) {
                         grid1[rr][cc].setColor(Color.RED);
                     }
-                    if (g2[rr][cc] == 1) {
+                    if (g2[cc][rr] == 1) {
                         grid2[rr][cc].setColor(Color.RED);
                     }
-                    if (g3[rr][cc] == 1) {
+                    if (g3[cc][rr] == 1) {
                         grid3[rr][cc].setColor(Color.RED);
                     }
-                    if (g4[rr][cc] == 1) {
+                    if (g4[cc][rr] == 1) {
                         grid4[rr][cc].setColor(Color.RED);
                     }
                 } catch (Exception e) {
@@ -163,15 +188,6 @@ public class ButtonGrid extends JPanel implements ActionListener {
             }
         }
 
-        history.add(hp1);
-        history.add(l1);
-        history.add(hp2);
-        history.add(l2);
-        history.add(hp3);
-        history.add(l3);
-        history.add(hp4);
-        history.add(l4);
-        history.add(backButton);
     }
 
     @Override

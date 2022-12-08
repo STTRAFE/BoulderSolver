@@ -70,7 +70,7 @@ public class SaveLoad {
             if (full) break;
             if (s.startsWith("BOULDER")) {
                 String[] args = s.split(":");
-                if (n > 3) {
+                if (n >= 3) {
                     System.out.println("full 4");
                     full = true;
                 } else {
