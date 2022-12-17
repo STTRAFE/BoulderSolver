@@ -99,17 +99,6 @@ public class SaveLoad {
             }
         }
 
-//        for (int p = 0; p < 4; p ++) {
-//            System.out.println("==History " + p + " ==");
-//            for (int k = 0; k < 7; k++) {
-//                for (int j = 0; j < 7; j++) {
-//                    System.out.print(historicGrids[p].getGrid()[k][j]);
-//                }
-//                System.out.println();
-//            }
-//            System.out.println("==Steps " + historicGrids[p].getSteps() + " ==");
-//        }
-
         return historicGrids;
     }
 }

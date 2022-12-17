@@ -28,13 +28,13 @@ public class Solver {
             while (!moveList.isEmpty()) {
                 Move m = moveList.poll();
                 stepsNum++;
-                ButtonGrid.grid[m.p.y][m.p.x-1].setTextOnButton(String.valueOf(stepsNum));
-                ButtonGrid.grid[m.p.y][m.p.x-1].setColor(Color.pink);
+                GUI.grid[m.p.y][m.p.x-1].setTextOnButton(String.valueOf(stepsNum));
+                GUI.grid[m.p.y][m.p.x-1].setColor(Color.pink);
                 switch (m.offsetType) {
                     case 1:
 //                        System.out.println("up" + " " + m.p.x + " " + (m.p.y + 1));
                         try {
-                            ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/up.png"))));
+                            GUI.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/up.png"))));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -42,7 +42,7 @@ public class Solver {
                     case 2:
 //                        System.out.println("down" + " " + m.p.x + " " + (m.p.y + 1));
                         try {
-                            ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/down.png"))));
+                            GUI.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/down.png"))));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -50,7 +50,7 @@ public class Solver {
                     case 3:
 //                        System.out.println("left" + " " + m.p.x + " " + (m.p.y + 1));
                         try {
-                            ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/left.png"))));
+                            GUI.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/left.png"))));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -58,7 +58,7 @@ public class Solver {
                     case 4:
 //                        System.out.println("right" + " " + m.p.x + " " + (m.p.y + 1));
                         try {
-                            ButtonGrid.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/right.png"))));
+                            GUI.grid[m.p.y][m.p.x-1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/right.png"))));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -99,32 +99,32 @@ public class Solver {
             */
             Point start = r.player;
             if (start.x == 0) { // Stops searching once it reaches goal
-                solvedRoutes.add(r); //Adds path to solvedRoutes treeset
+                solvedRoutes.add(r); //Adds path to solvedRoutes set
                 solutions++;
                 continue;
             }
             grid = r.grid;
-            HashSet<Point> playerLocs = new HashSet<>();
-            ArrayDeque<Point> pMoves = new ArrayDeque<>();
-            pMoves.add(start);
-            findPaths:
-            while (!pMoves.isEmpty()) { // Iterates through pMoves queue
-                Point loc = pMoves.poll();
-                if (playerLocs.contains(loc)) continue; // Pulls player location from pMoves and checks if it already existed
-                playerLocs.add(loc);
+            HashSet<Point> playerLocations = new HashSet<>();
+            ArrayDeque<Point> playerMoves = new ArrayDeque<>();
+            playerMoves.add(start);
+            while (!playerMoves.isEmpty()) { // Iterates through playerMoves queue
+                Point loc = playerMoves.poll();
+                if (playerLocations.contains(loc)) continue; // Pulls player location from playerMoves and checks if it already existed
+                playerLocations.add(loc);
                 Set<Point> moves = validMoves(loc); // Generates possible moves from location, checks if it is valid
                 for (Point p1 : moves) {
                     if (p1.x == 0) { // Check if it reaches finishing line (x=0)
                         solvedRoutes.add(r);
                         solutions++;
-                        pMoves.clear();
-                        continue findPaths;
+                        playerMoves.clear();
+                        continue;
                     }
-                    if (grid[p1.x][p1.y] == 1) continue; // Checks if there is a boulder, if it does not add to possible Moves
-                    pMoves.add(p1);
+                    if (grid[p1.x][p1.y] != 1) {
+                        playerMoves.add(p1);  // Checks if there is a boulder, if it does not add to possible Moves
+                    }
                 }
             }
-            for (Point p : playerLocs) { // Iterates through every possible position player can get to without moving a Boulder
+            for (Point p : playerLocations) { // Iterates through every possible position player can get to without moving a Boulder
                 getValidBoulderPush(p, grid, validMoves(p), r); // Checks if there is a valid boulder movement
             }
         }
@@ -134,11 +134,6 @@ public class Solver {
                 return false;
             }
             solvedRoute = r;
-            ArrayDeque<Move> cloned = new ArrayDeque<>(r.moveList);
-            while (!cloned.isEmpty()) { // copies the possible moves
-                Move poll = cloned.poll();
-                pushBoulder(poll, newGrid);
-            }
             return true;
         }
         return false;
@@ -147,7 +142,7 @@ public class Solver {
     private void getValidBoulderPush(Point start, int[][] grid, Set<Point> moves, Route r) {
         for (Point p : moves) {
             int[][] newGrid = copyGrid(grid);
-            Move push = pushBoulder(start.x, start.y, p.x, p.y, newGrid);
+            Move push = simulatePush(start.x, start.y, p.x, p.y, newGrid);
             if (push == null || visited.contains(getGridCode(newGrid))) continue;
             Route move = new Route(r);
             move.moveList.add(push);
@@ -158,7 +153,7 @@ public class Solver {
         }
     }
 
-    private void pushBoulder(Move move, int[][] grid) {
+    private void simulatePush(Move move, int[][] grid) {
         int x = move.p.x;
         int y = move.p.y;
         switch (move.offsetType) {
@@ -181,7 +176,7 @@ public class Solver {
         }
     }
 
-    private Move pushBoulder(int playerX, int playerY, int boulderX, int boulderY, int[][] grid) {
+    private Move simulatePush(int playerX, int playerY, int boulderX, int boulderY, int[][] grid) {
 
         if (grid[boulderX][boulderY] != 1 || boulderX == 0 || boulderX == 7) return null;
 

@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Queue;
 
-public class ButtonGrid extends JPanel implements ActionListener {
+public class GUI implements ActionListener {
 
     private static final int BORDER = 1;
     public static BoulderButtons[][] grid;
@@ -26,8 +26,13 @@ public class ButtonGrid extends JPanel implements ActionListener {
     private final JPanel hp2 = new JPanel();
     private final JPanel hp3 = new JPanel();
     private final JPanel hp4 = new JPanel();
+    private final JPanel buttonGrid = new JPanel();
     private final JFrame main = new JFrame("Boulder Solver");
     private final JFrame history = new JFrame("History");
+    private final static BoulderButtons[][] grid1 = new BoulderButtons[7][7];
+    private final static BoulderButtons[][] grid2 = new BoulderButtons[7][7];
+    private final static BoulderButtons[][] grid3 = new BoulderButtons[7][7];
+    private final static BoulderButtons[][] grid4 = new BoulderButtons[7][7];
     private static int ROWS;
     private static int COL;
     private Queue<?> steps;
@@ -35,9 +40,10 @@ public class ButtonGrid extends JPanel implements ActionListener {
     private static int stepsNum = 0;
     private static boolean allHintsDisplayed = false;
 
-    public ButtonGrid(int r,int c) {
-        setLayout(new GridLayout(r,c, BORDER, BORDER));
-        setBackground(Color.WHITE);
+    public GUI(int r, int c) {
+
+        buttonGrid.setLayout(new GridLayout(r,c, BORDER, BORDER));
+        buttonGrid.setBackground(Color.WHITE);
         ROWS = r;
         COL = c;
 
@@ -53,7 +59,7 @@ public class ButtonGrid extends JPanel implements ActionListener {
         for(int cc=0; cc<COL; cc++){
             for(int rr=0; rr<ROWS; rr++){
                 grid[rr][cc] = new BoulderButtons(rr,cc);
-                add(grid[rr][cc]); //add button to panel
+                buttonGrid.add(grid[rr][cc]); //add button to panel
             }
         }
         this.initBoard();
@@ -62,23 +68,25 @@ public class ButtonGrid extends JPanel implements ActionListener {
     public void initBoard() {
         main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         main.setLayout(new GridBagLayout());
-        main.add(this);
+        main.add(buttonGrid);
 //        main.setSize(730,480);
         main.setSize(900,600);
         main.setResizable(false);
 
-        solveButton.setBounds(150,10,200,40);
-        hintsButton.setBounds(150,10,200,40);
-        historyButton.setBounds(150,10,200,40);
-        resetButton.setBounds(150,10,200,40);
-        trackerButton.setBounds(720,250,500,40);
+        solveButton.setBounds(150,10,400,80);
+        hintsButton.setBounds(150,10,400,80);
+        historyButton.setBounds(150,10,400,80);
+        resetButton.setBounds(150,10,400,80);
+        trackerButton.setBounds(720,250,500,80);
 
         JPanel buttons = new JPanel();
-        buttons.add(solveButton);
-        buttons.add(hintsButton);
-        buttons.add(historyButton);
-        buttons.add(resetButton);
-        buttons.add(trackerButton);
+        buttons.setLayout(new BorderLayout());
+
+        buttons.add(solveButton,BorderLayout.PAGE_START);
+        buttons.add(hintsButton,BorderLayout.CENTER);
+        buttons.add(historyButton,BorderLayout.LINE_END);
+        buttons.add(resetButton,BorderLayout.LINE_START);
+        buttons.add(trackerButton,BorderLayout.PAGE_END);
         main.add(buttons);
 
 
@@ -94,7 +102,7 @@ public class ButtonGrid extends JPanel implements ActionListener {
     }
 
     public void historyFrame() {
-        history.setLayout(new GridLayout());
+        history.setLayout(new GridBagLayout());
         history.setResizable(false);
         history.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        history.setSize(730,480);
@@ -112,20 +120,7 @@ public class ButtonGrid extends JPanel implements ActionListener {
         hp2.setLayout(new GridLayout(7,7, BORDER, BORDER));
         hp3.setLayout(new GridLayout(7,7, BORDER, BORDER));
         hp4.setLayout(new GridLayout(7,7, BORDER, BORDER));
-        historyDisplay();
 
-        history.add(hp1);
-        history.add(l1);
-        history.add(hp2);
-        history.add(l2);
-        history.add(hp3);
-        history.add(l3);
-        history.add(hp4);
-        history.add(l4);
-        history.add(backButton);
-    }
-
-    public void historyDisplay() {
 
         HistoricGrid[] g = SaveLoad.load();
         try {
@@ -143,11 +138,6 @@ public class ButtonGrid extends JPanel implements ActionListener {
             } else l4.setText("Steps: " + g[3].getSteps());
 
         } catch (Exception ignored) {}
-
-        BoulderButtons[][] grid1 = new BoulderButtons[7][7];
-        BoulderButtons[][] grid2 = new BoulderButtons[7][7];
-        BoulderButtons[][] grid3 = new BoulderButtons[7][7];
-        BoulderButtons[][] grid4 = new BoulderButtons[7][7]; //allocate grid
 
         for(int cc=0; cc<7; cc++){
             for(int rr=0; rr<7; rr++){
@@ -181,6 +171,7 @@ public class ButtonGrid extends JPanel implements ActionListener {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
                 hp1.add(grid1[rr][cc]);
                 hp2.add(grid2[rr][cc]);
                 hp3.add(grid3[rr][cc]);
@@ -188,6 +179,89 @@ public class ButtonGrid extends JPanel implements ActionListener {
             }
         }
 
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        history.add(hp1,gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        history.add(l1,gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        history.add(hp2,gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        history.add(l2,gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        history.add(hp3,gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        history.add(l3,gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        history.add(hp4,gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 1;
+        history.add(l4,gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 2;
+        gbc.weighty = 0.5;
+        gbc.gridheight = GridBagConstraints.REMAINDER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        history.add(backButton,gbc);
+    }
+
+
+    public void updateHistoryFrame() {
+        HistoricGrid[] g = SaveLoad.load();
+        try {
+            if (g[0].getSteps() == -1) {
+                l1.setText("Used Solver");
+            } else l1.setText("Steps: " + g[0].getSteps());
+            if (g[1].getSteps() == -1) {
+                l2.setText("Used Solver");
+            } else l2.setText("Steps: " + g[1].getSteps());
+            if (g[2].getSteps() == -1) {
+                l3.setText("Used Solver");
+            } else l3.setText("Steps: " + g[2].getSteps());
+            if (g[3].getSteps() == -1) {
+                l4.setText("Used Solver");
+            } else l4.setText("Steps: " + g[3].getSteps());
+
+            for(int cc=1; cc<6; cc++) {
+                for (int rr = 0; rr < 7; rr++) {
+
+                        int[][] g1 = g[0].getGrid();
+                        int[][] g2 = g[1].getGrid();
+                        int[][] g3 = g[2].getGrid();
+                        int[][] g4 = g[3].getGrid();
+                        if (g1[cc][rr] == 1) {
+                            grid1[rr][cc].setColor(Color.RED);
+                        } else {
+                            grid1[rr][cc].setColor(Color.WHITE);
+                        }
+                        if (g2[cc][rr] == 1) {
+                            grid2[rr][cc].setColor(Color.RED);
+                        } else {
+                            grid2[rr][cc].setColor(Color.WHITE);
+                        }
+                        if (g3[cc][rr] == 1) {
+                            grid3[rr][cc].setColor(Color.RED);
+                        } else {
+                            grid3[rr][cc].setColor(Color.WHITE);
+                        }
+                        if (g4[cc][rr] == 1) {
+                            grid4[rr][cc].setColor(Color.RED);
+                        } else {
+                            grid4[rr][cc].setColor(Color.WHITE);
+                        }
+                }
+            }
+        } catch (Exception ignored) {}
     }
 
     @Override
@@ -196,24 +270,12 @@ public class ButtonGrid extends JPanel implements ActionListener {
             hintsUsed = -1;
             removeButtonSettings();
             inputGrid();
-//            System.out.println("================");
-//            for (int y = 0; y < COL; y++) {
-//                for (int x = 0; x < ROWS; x++) {
-//                    if (grid[x][y].isPressed()) {
-//                        System.out.print("0 ");
-//                    } else {
-//                        System.out.print("x ");
-//                    }
-//                }
-//                System.out.println();
-//            }
-//            System.out.println("================");
             Solver solve = new Solver(gridToSolve);
             if (solve.solve()) {
                 solve.showSolution();
-                JOptionPane.showMessageDialog(this,"Solvable");
+                JOptionPane.showMessageDialog(buttonGrid,"Solvable");
             } else {
-                JOptionPane.showMessageDialog(this,"No Solution");
+                JOptionPane.showMessageDialog(buttonGrid,"No Solution");
             }
         } else if (e.getSource() == hintsButton) {
             if (!boardUpdated(gridToSolve) && allHintsDisplayed) return;
@@ -226,12 +288,12 @@ public class ButtonGrid extends JPanel implements ActionListener {
                     Solver.Move m = (Solver.Move) steps.poll();
                     stepsNum++;
                     if (hintsUsed != -1) hintsUsed = stepsNum;
-                    ButtonGrid.grid[m.p.y][m.p.x-1].setTextOnButton(String.valueOf(stepsNum));
+                    GUI.grid[m.p.y][m.p.x-1].setTextOnButton(String.valueOf(stepsNum));
                     switch (m.offsetType) {
                         case 1 -> {
                             System.out.println("up" + " " + m.p.x + " " + (m.p.y + 1));
                             try {
-                                ButtonGrid.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/up.png"))));
+                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/up.png"))));
                             } catch (Exception k) {
                                 k.printStackTrace();
                             }
@@ -239,7 +301,7 @@ public class ButtonGrid extends JPanel implements ActionListener {
                         case 2 -> {
                             System.out.println("down" + " " + m.p.x + " " + (m.p.y + 1));
                             try {
-                                ButtonGrid.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/down.png"))));
+                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/down.png"))));
                             } catch (Exception k) {
                                 k.printStackTrace();
                             }
@@ -247,7 +309,7 @@ public class ButtonGrid extends JPanel implements ActionListener {
                         case 3 -> {
                             System.out.println("left" + " " + m.p.x + " " + (m.p.y + 1));
                             try {
-                                ButtonGrid.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/left.png"))));
+                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/left.png"))));
                             } catch (Exception k) {
                                 k.printStackTrace();
                             }
@@ -255,26 +317,26 @@ public class ButtonGrid extends JPanel implements ActionListener {
                         case 4 -> {
                             System.out.println("right" + " " + m.p.x + " " + (m.p.y + 1));
                             try {
-                                ButtonGrid.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/right.png"))));
+                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/resources/right.png"))));
                             } catch (Exception k) {
                                 k.printStackTrace();
                             }
                         }
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this,"All steps displayed");
+                    JOptionPane.showMessageDialog(buttonGrid,"All steps displayed");
                     steps = null;
                     stepsNum = 0;
                     allHintsDisplayed = true;
-                    removeButtonSettings();
                 }
             } else {
-                JOptionPane.showMessageDialog(this,"No Solution");
+                JOptionPane.showMessageDialog(buttonGrid,"No Solution");
             }
 
         } else if(e.getSource() == historyButton) {
             main.setVisible(false);
             history.setVisible(true);
+            updateHistoryFrame();
         } else if (e.getSource() == resetButton) {
             resetGrid();
         } else if (e.getSource() == trackerButton) {
