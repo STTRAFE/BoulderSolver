@@ -36,7 +36,7 @@ public class BoulderButtons extends JButton implements ActionListener {
 
     public void historyBoardConfig(int size, boolean b) {
         this.setPreferredSize(new Dimension(size,size));
-        canInteract = false;
+        canInteract = b;
     }
 
     public void setColor(Color c) {
