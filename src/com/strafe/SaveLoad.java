@@ -13,7 +13,7 @@ public class SaveLoad {
     public static HistoricGrid[] historicGrids = new HistoricGrid[4];
     private static final Pattern p  = Pattern.compile("([0,1]), ([0-1]), ([0-1]), ([0-1]), ([0-1]), ([0-1]), ([0-1])");
 
-    public static void saveLoad(int [][] grid, int steps, int ROWS) {
+    public static void save(int [][] grid, int steps, int ROWS) {
         File dir = new File(System.getProperty("user.dir"), "boulder");
         if (!dir.exists()) {
             dir.mkdir();
@@ -24,13 +24,10 @@ public class SaveLoad {
             } catch (IOException e) {e.printStackTrace();}
         }
 
-        save(grid,steps,ROWS);
-    }
-    public static void save(int [][] grid, int steps, int ROWS) {
         ArrayList<String> toSave = new ArrayList<>();
 
         for (int i = 0; i < ROWS; i ++) {
-           toSave.add(Arrays.toString(grid[i+1]));
+            toSave.add(Arrays.toString(grid[i+1]));
         }
 
         toSave.add("BOULDER:" + steps + ":");
