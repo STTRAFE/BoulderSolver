@@ -13,13 +13,14 @@ public class Solver {
     private TreeSet<Route> solvedRoutes;
     private Route solvedRoute;
     private final HashSet<int[][]> visited;
+    private long time1;
 
     public Solver(int[][] solveGrid) {
         this.grid = solveGrid;
         this.routes = new LinkedList<>();
         this.solvedRoutes = new TreeSet<>();
         this.visited = new HashSet<>();
-        this.solvedRoute = null;
+        this.solvedRoute = new Route();
     }
 
     public void showSolution() {
@@ -30,23 +31,139 @@ public class Solver {
                 Move m = moveList.poll();
                 stepsNum++;
                 GUI.grid[m.p.y][m.p.x - 1].setTextOnButton(String.valueOf(stepsNum));
-                    try {
-                        switch (m.direction) {
-                            case "U" ->
-                                    GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/up.png")))));
-                            case "D" ->
-                                    GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/down.png")))));
-                            case "L" ->
-                                    GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/left.png")))));
-                            case "R" ->
-                                    GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/right.png")))));
-                        }
-                    } catch (IOException ignored) {}
+                try {
+                    switch (m.direction) {
+                        case "U" ->
+                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/up.png")))));
+                        case "D" ->
+                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/down.png")))));
+                        case "L" ->
+                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/left.png")))));
+                        case "R" ->
+                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/right.png")))));
+                    }
+                } catch (IOException ignored) {
+                }
             }
         }
     }
 
-    public Queue<Move> getSteps() { return solvedRoute.moves; }
+    public Queue<Move> getSteps() {
+        return solvedRoute.moves;
+    }
+
+
+    public void dfs() {
+        int[][] newGrid = copyGrid(grid);
+        time1 = System.currentTimeMillis();
+        System.out.println(search(newGrid, 7, 0,solvedRoute));
+        for (int r = 0; r < grid.length; r++) {
+            for (int c = 0; c < grid[0].length; c++) {
+                System.out.print(newGrid[r][c] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public boolean search(int[][] grid, int x, int y, Route r) {
+        if (x < 0 || y < 0 || x >= 8 || y > 8) return false;
+        if (System.currentTimeMillis() - time1 > 50) return false;
+        if (visited.contains(grid)) return false;
+        visited.add(grid);
+        if (x == 1) {
+            System.out.println("solved");
+            return true;
+        }
+
+        if (grid[x][y] == 0) {
+            grid[x][y] = 2;
+            if (canGoThere(x, y, grid, "D") && search(push(x, y, grid, "D"), x + 1, y, r)) {;
+                Move m = new Move();
+                m.p.x = x;
+                m.p.y = y;
+                m.direction = "D";
+                r.moves.add(m);
+                System.out.println("up");
+                return true;
+            } else if (canGoThere(x, y, grid, "U") && search(push(x, y, grid, "U"), x - 1, y, r)) {
+                Move m = new Move();
+                m.p.x = x;
+                m.p.y = y;
+                m.direction = "U";
+                r.moves.add(m);
+                return true;
+            } else if (canGoThere(x, y, grid, "R") && search(push(x, y, grid, "R"), x, y + 1, r)) {
+                Move m = new Move();
+                m.p.x = x;
+                m.p.y = y;
+                m.direction = "R";
+                r.moves.add(m);
+                return true;
+            } else if (canGoThere(x, y, grid, "L") && search(push(x, y, grid, "L"), x, y - 1, r)) {
+                Move m = new Move();
+                m.p.x = x;
+                m.p.y = y;
+                m.direction = "L";
+                r.moves.add(m);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public boolean canGoThere(int x, int y, int[][] grid, String direction) {
+        switch (direction) {
+            case "U" -> {
+                if (x > 0 && (grid[x - 1][y] == 0 || grid[x - 1][y] == 2)) {
+                    return true;
+                } else return x > 3 && grid[x - 1][y] == 1 && grid[x - 2][y] == 0;
+            }
+            case "D" -> {
+                if (x > 7 && (grid[x + 1][y] == 0 || grid[x + 1][y] == 2)) {
+                    return true;
+                } else return x < 5 && grid[x + 1][y] == 1 && grid[x + 2][y] == 0;
+            }
+            case "R" -> {
+                if (y < 6 && (grid[x][y + 1] == 0 || grid[x][y + 1] == 2)) {
+                    return true;
+                } else return y < 5 && grid[x][y + 1] == 1 && grid[x][y + 2] == 0;
+            }
+            case "L" -> {
+                if (y > 0 && (grid[x][y - 1] == 0 || grid[x][y - 1] == 2)) {
+                    return true;
+                } else return y > 1 && grid[x][y - 1] == 1 && grid[x][y - 2] == 0;
+            }
+
+        }
+        return false;
+    }
+
+    public int[][] push(int x, int y, int[][] grid, String direction) {
+        int[][] g = copyGrid(grid);
+        switch (direction) {
+            case "U":
+                if (g[x - 1][y] == 0 || g[x - 1][y] == 2) break;
+                g[x - 2][y] = 1;
+                g[x - 1][y] = 0;
+            case "D":
+                if (x == 7) break;
+                if (g[x + 1][y] == 0 || g[x + 1][y] == 2) break;
+                g[x + 2][y] = 1;
+                g[x + 1][y] = 0;
+            case "L":
+                if (g[x][y - 1] == 0 || g[x][y - 1] == 2) break;
+                g[x][y - 2] = 1;
+                g[x][y - 1] = 0;
+            case "R":
+                if (g[x][y + 1] == 0 || g[x][y + 1] == 2) break;
+                g[x][y + 2] = 1;
+                g[x][y + 1] = 0;
+        }
+        return g;
+    }
+
+
 
     public boolean solve() {
         int solutions = 0;
@@ -72,23 +189,24 @@ public class Solver {
 
             grid = r.grid;
             HashSet<Point> playerLocations = new HashSet<>();
-            Queue<Point> playerMoves = new LinkedList<>();
+            Queue<Point> nextMove = new LinkedList<>();
 
-            playerMoves.add(r.p);
-            while (!playerMoves.isEmpty()) { // Iterates through playerMoves queue
-                Point cPos = playerMoves.poll();
-                if (playerLocations.contains(cPos)) continue; // Pulls player location from playerMoves and checks if it already existed
+            nextMove.add(r.p);
+            while (!nextMove.isEmpty()) { // Iterates through nextMove queue
+                Point cPos = nextMove.poll();
+                if (playerLocations.contains(cPos))
+                    continue; // Pulls player location from nextMove and checks if it already existed
                 playerLocations.add(cPos);
                 Set<Point> moves = validMoves(cPos); // Generates possible moves from location, checks if it is valid
                 for (Point p1 : moves) {
                     if (p1.x == 0) { // Check if it reaches finishing line (x=0)
                         solvedRoutes.add(r);
                         solutions++;
-                        playerMoves.clear();
+                        nextMove.clear();
                         continue;
                     }
                     if (grid[p1.x][p1.y] != 1) {
-                        playerMoves.add(p1);  // Checks if there is a boulder, if it does not add to possible Moves
+                        nextMove.add(p1);  // Checks if there is a boulder, if it does not add to possible Moves
                     }
                 }
             }
@@ -121,8 +239,8 @@ public class Solver {
 
 
     private Move simulatePush(int playerX, int playerY, int boulderX, int boulderY, int[][] grid) {
-
-        if (grid[boulderX][boulderY] != 1 || boulderX == 0 || boulderX == 7) return null; // Making sure it is within boundaries
+        if (boulderX < 0 || boulderY < 0 || boulderX >= 7 || boulderY > 7 || grid[boulderX][boulderY] != 1)
+            return null; // Making sure it is within boundaries
 
         if (boulderX - playerX == -1) { // go up
             if (boulderX == 2) return null; // the row below finish line
@@ -193,7 +311,9 @@ public class Solver {
     private int[][] copyGrid(int[][] g) {
         int[][] output = new int[g.length][g[0].length];
         for (int i = 0; i < g.length; i++) {
-            System.arraycopy(g[i], 0, output[i], 0, g[0].length);
+            for (int j = 0; j < g[0].length; j++) {
+                output[i][j] = g[i][j];
+            }
         }
         return output;
     }
@@ -225,6 +345,10 @@ public class Solver {
     public static class Move {
         String direction;
         Point p;
+
+        Move() {
+            p = new Point();
+        }
         /* Move Directions:
         U = Up
         D = Down

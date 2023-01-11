@@ -121,23 +121,6 @@ public class GUI implements ActionListener {
         hp4.setLayout(new GridLayout(7, 7, BORDER, BORDER));
 
 
-        HistoricGrid[] g = SaveLoad.load(); // Retrieve the latest four saves
-        try { // If steps is -1, player used solver
-            if (g[0].getSteps() == -1) {
-                l1.setText("Used Solver");
-            } else l1.setText("Steps: " + g[0].getSteps());
-            if (g[1].getSteps() == -1) {
-                l2.setText("Used Solver");
-            } else l2.setText("Steps: " + g[1].getSteps());
-            if (g[2].getSteps() == -1) {
-                l3.setText("Used Solver");
-            } else l3.setText("Steps: " + g[2].getSteps());
-            if (g[3].getSteps() == -1) {
-                l4.setText("Used Solver");
-            } else l4.setText("Steps: " + g[3].getSteps());
-        } catch (Exception ignored) {
-        }
-
         for (int cc = 0; cc < 7; cc++) {
             for (int rr = 0; rr < 7; rr++) {
                 grid1[rr][cc] = new BoulderButtons(rr, cc); // Create the buttons
@@ -200,6 +183,7 @@ public class GUI implements ActionListener {
         boolean gb1 = true;
         boolean gb2 = true;
         boolean gb3 = true;
+
         if (g[0] == null) gb0 = false; // Flags to prevent crashes when historic grids do not exist
         if (g[1] == null) gb1 = false;
         if (g[2] == null) gb2 = false;
@@ -285,12 +269,14 @@ public class GUI implements ActionListener {
             removeButtonSettings(); // Reset button settings
             inputGrid(); // Input the user input into a grid to solve
             Solver solve = new Solver(gridToSolve); // Initialize solver
-            if (solve.solve()) { // Check if grid can be solved
-                solve.showSolution(); // Show solution
-                JOptionPane.showMessageDialog(buttonGrid, "Solvable");
-            } else {
-                JOptionPane.showMessageDialog(buttonGrid, "No Solution");
-            }
+            solve.dfs();
+            solve.showSolution();
+//            if (solve.solve()) { // Check if grid can be solved
+//                solve.showSolution(); // Show solution
+//                JOptionPane.showMessageDialog(buttonGrid, "Solvable");
+//            } else {
+//                JOptionPane.showMessageDialog(buttonGrid, "No Solution");
+//            }
         } else if (e.getSource() == hintsButton) {
             if (!boardUpdated(gridToSolve) && allHintsDisplayed) return; // Prevents user from adding hint count when all hints displayed
             inputGrid(); // input the map into gridToSolve
