@@ -278,39 +278,38 @@ public class GUI implements ActionListener {
 //                JOptionPane.showMessageDialog(buttonGrid, "No Solution");
 //            }
         } else if (e.getSource() == hintsButton) {
-            if (!boardUpdated(gridToSolve) && allHintsDisplayed) return; // Prevents user from adding hint count when all hints displayed
-            inputGrid(); // input the map into gridToSolve
-            allHintsDisplayed = false;
-            Solver solve = new Solver(gridToSolve); // Initialize Solver
-            if (solve.solve()) { // Check if solvable
-                if (steps == null) steps = solve.getSteps(); // Retrieve queue of steps
-                if (!steps.isEmpty()) {
-                    Solver.Move m = (Solver.Move) steps.poll(); // Dequeues from the steps queue
-                    stepsNum++; // Increase the hints used count by one
-                    if (hintsUsed != -1) hintsUsed = stepsNum; // If solver is used, user save hints used number
-                    GUI.grid[m.p.y][m.p.x - 1].setTextOnButton(String.valueOf(stepsNum)); // Displays the number of steps on button
-                    try {
-                        switch (m.direction) { // Displays image on the button
-                            case "U" ->
-                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/up.png")))));
-                            case "D" ->
-                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/down.png")))));
-                            case "L" ->
-                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/left.png")))));
-                            case "R" ->
-                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/right.png")))));
-                        }
-                    } catch (Exception ignored) {}
-                } else {
-                    JOptionPane.showMessageDialog(buttonGrid, "All steps displayed"); // Resets once all steps displayed
-                    steps = null;
-                    stepsNum = 0;
-                    allHintsDisplayed = true;
-                }
-            } else {
-                JOptionPane.showMessageDialog(buttonGrid, "No Solution");
-            }
-
+//            if (!boardUpdated(gridToSolve) && allHintsDisplayed) return; // Prevents user from adding hint count when all hints displayed
+//            inputGrid(); // input the map into gridToSolve
+//            allHintsDisplayed = false;
+//            Solver solve = new Solver(gridToSolve); // Initialize Solver
+//            if (solve.solve()) { // Check if solvable
+////                if (steps == null) steps = solve.getSteps(); // Retrieve queue of steps
+//                if (!steps.isEmpty()) {
+//                    Solver.Move m = (Solver.Move) steps.poll(); // Dequeues from the steps queue
+//                    stepsNum++; // Increase the hints used count by one
+//                    if (hintsUsed != -1) hintsUsed = stepsNum; // If solver is used, user save hints used number
+//                    GUI.grid[m.p.y][m.p.x - 1].setTextOnButton(String.valueOf(stepsNum)); // Displays the number of steps on button
+//                    try {
+//                        switch (m.direction) { // Displays image on the button
+//                            case "U" ->
+//                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/up.png")))));
+//                            case "D" ->
+//                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/down.png")))));
+//                            case "L" ->
+//                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/left.png")))));
+//                            case "R" ->
+//                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/right.png")))));
+//                        }
+//                    } catch (Exception ignored) {}
+//                } else {
+//                    JOptionPane.showMessageDialog(buttonGrid, "All steps displayed"); // Resets once all steps displayed
+//                    steps = null;
+//                    stepsNum = 0;
+//                    allHintsDisplayed = true;
+//                }
+//            } else {
+//                JOptionPane.showMessageDialog(buttonGrid, "No Solution");
+//            }
         } else if (e.getSource() == historyButton) {
             main.setVisible(false);
             history.setVisible(true);

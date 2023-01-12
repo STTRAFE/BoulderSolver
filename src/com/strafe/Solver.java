@@ -14,6 +14,9 @@ public class Solver {
     private Route solvedRoute;
     private final HashSet<int[][]> visited;
     private long time1;
+    public int solutions = 5;
+    private int solutionsLength = 1;
+    private int fastestSolution = 0;
 
     public Solver(int[][] solveGrid) {
         this.grid = solveGrid;
@@ -26,21 +29,17 @@ public class Solver {
     public void showSolution() {
         if (solvedRoute != null) {
             int stepsNum = 0;
-            Queue<Move> moveList = solvedRoute.moves;
+            Stack<Move> moveList = solvedRoute.moves;
             while (!moveList.isEmpty()) {
-                Move m = moveList.poll();
+                Move m = moveList.pop();
                 stepsNum++;
                 GUI.grid[m.p.y][m.p.x - 1].setTextOnButton(String.valueOf(stepsNum));
                 try {
                     switch (m.direction) {
-                        case "U" ->
-                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/up.png")))));
-                        case "D" ->
-                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/down.png")))));
-                        case "L" ->
-                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/left.png")))));
-                        case "R" ->
-                                GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/right.png")))));
+                        case "U" -> GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/up.png")))));
+                        case "D" -> GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/down.png")))));
+                        case "L" -> GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/left.png")))));
+                        case "R" -> GUI.grid[m.p.y][m.p.x - 1].setIcon(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/resources/right.png")))));
                     }
                 } catch (IOException ignored) {
                 }
@@ -48,21 +47,21 @@ public class Solver {
         }
     }
 
-    public Queue<Move> getSteps() {
-        return solvedRoute.moves;
-    }
+//    public Queue<Move> getSteps() {
+//        return solvedRoute.moves;
+//    }
 
 
     public void dfs() {
         int[][] newGrid = copyGrid(grid);
         time1 = System.currentTimeMillis();
-        System.out.println(search(newGrid, 7, 0,solvedRoute));
-        for (int r = 0; r < grid.length; r++) {
-            for (int c = 0; c < grid[0].length; c++) {
-                System.out.print(newGrid[r][c] + " ");
-            }
-            System.out.println();
-        }
+        System.out.println(search(newGrid, 7, 0, solvedRoute));
+//        for (int r = 0; r < grid.length; r++) {
+//            for (int c = 0; c < grid[0].length; c++) {
+//                search(newGrid,7,0,solvedRoute);
+//            }
+//            System.out.println();
+//        }
     }
 
     public boolean search(int[][] grid, int x, int y, Route r) {
@@ -70,36 +69,36 @@ public class Solver {
         if (System.currentTimeMillis() - time1 > 50) return false;
         if (visited.contains(grid)) return false;
         visited.add(grid);
+        if (solutions > 5) return true;
         if (x == 1) {
             System.out.println("solved");
-            return true;
+            solutions++;
         }
-
         if (grid[x][y] == 0) {
             grid[x][y] = 2;
-            if (canGoThere(x, y, grid, "D") && search(push(x, y, grid, "D"), x + 1, y, r)) {;
+            if ((canPush(x, y, grid, "D") || canGoThere(x, y, grid, "D")) && search(push(x, y, grid, "D"), x + 1, y, r)) {
+                System.out.println("test");
                 Move m = new Move();
                 m.p.x = x;
                 m.p.y = y;
                 m.direction = "D";
                 r.moves.add(m);
-                System.out.println("up");
                 return true;
-            } else if (canGoThere(x, y, grid, "U") && search(push(x, y, grid, "U"), x - 1, y, r)) {
+            } else if ((canPush(x, y, grid, "U") || canGoThere(x, y, grid, "U")) && search(push(x, y, grid, "U"), x - 1, y, r)) {
                 Move m = new Move();
                 m.p.x = x;
                 m.p.y = y;
                 m.direction = "U";
                 r.moves.add(m);
                 return true;
-            } else if (canGoThere(x, y, grid, "R") && search(push(x, y, grid, "R"), x, y + 1, r)) {
+            } else if ((canPush(x, y, grid, "R") || canGoThere(x, y, grid, "R")) && search(push(x, y, grid, "R"), x, y + 1, r)) {
                 Move m = new Move();
                 m.p.x = x;
                 m.p.y = y;
                 m.direction = "R";
                 r.moves.add(m);
                 return true;
-            } else if (canGoThere(x, y, grid, "L") && search(push(x, y, grid, "L"), x, y - 1, r)) {
+            } else if ((canPush(x, y, grid, "L") || canGoThere(x, y, grid, "L")) && search(push(x, y, grid, "L"), x, y - 1, r)) {
                 Move m = new Move();
                 m.p.x = x;
                 m.p.y = y;
@@ -111,33 +110,52 @@ public class Solver {
         return false;
     }
 
+    public boolean canPush(int x, int y, int[][] grid, String direction) {
+        switch (direction) {
+            case "U" -> {
+                return x > 3 && grid[x - 1][y] == 1 && grid[x - 2][y] == 0;
+            }
+            case "D" -> {
+                return x < 5 && grid[x + 1][y] == 1 && grid[x + 2][y] == 0;
+            }
+            case "R" -> {
+                return y < 5 && grid[x][y + 1] == 1 && grid[x][y + 2] == 0;
+            }
+            case "L" -> {
+                return y > 1 && grid[x][y - 1] == 1 && grid[x][y - 2] == 0;
+            }
+
+        }
+        return false;
+    }
 
     public boolean canGoThere(int x, int y, int[][] grid, String direction) {
         switch (direction) {
             case "U" -> {
                 if (x > 0 && (grid[x - 1][y] == 0 || grid[x - 1][y] == 2)) {
                     return true;
-                } else return x > 3 && grid[x - 1][y] == 1 && grid[x - 2][y] == 0;
+                }
             }
             case "D" -> {
                 if (x > 7 && (grid[x + 1][y] == 0 || grid[x + 1][y] == 2)) {
                     return true;
-                } else return x < 5 && grid[x + 1][y] == 1 && grid[x + 2][y] == 0;
+                }
             }
             case "R" -> {
                 if (y < 6 && (grid[x][y + 1] == 0 || grid[x][y + 1] == 2)) {
                     return true;
-                } else return y < 5 && grid[x][y + 1] == 1 && grid[x][y + 2] == 0;
+                }
             }
             case "L" -> {
                 if (y > 0 && (grid[x][y - 1] == 0 || grid[x][y - 1] == 2)) {
                     return true;
-                } else return y > 1 && grid[x][y - 1] == 1 && grid[x][y - 2] == 0;
+                }
             }
 
         }
         return false;
     }
+
 
     public int[][] push(int x, int y, int[][] grid, String direction) {
         int[][] g = copyGrid(grid);
@@ -150,9 +168,8 @@ public class Solver {
                 if (x == 7) break;
                 if (g[x + 1][y] == 0 || g[x + 1][y] == 2) break;
                 g[x + 2][y] = 1;
-                g[x + 1][y] = 0;
             case "L":
-                if (g[x][y - 1] == 0 || g[x][y - 1] == 2) break;
+                if (g[x][y - 1] == 1 || g[x][y - 1] == 2) break;
                 g[x][y - 2] = 1;
                 g[x][y - 1] = 0;
             case "R":
@@ -162,7 +179,6 @@ public class Solver {
         }
         return g;
     }
-
 
 
     public boolean solve() {
@@ -210,9 +226,9 @@ public class Solver {
                     }
                 }
             }
-            for (Point p : playerLocations) { // Iterates through every possible position player can get to without moving a Boulder
-                generateMoves(p, grid, validMoves(p), r); // Checks if there is a valid boulder movement
-            }
+//            for (Point p : playerLocations) { // Iterates through every possible position player can get to without moving a Boulder
+//                generateMoves(p, grid, validMoves(p), r); // Checks if there is a valid boulder movement
+//            }
         }
         if (solutions != 0) {
             Route r = solvedRoutes.pollFirst();
@@ -223,19 +239,19 @@ public class Solver {
         return false;
     }
 
-    private void generateMoves(Point start, int[][] grid, Set<Point> moves, Route r) {
-        for (Point p : moves) {
-            int[][] newGrid = copyGrid(grid);
-            Move push = simulatePush(start.x, start.y, p.x, p.y, newGrid);
-            if (push == null || visited.contains(newGrid)) continue;
-            Route move = new Route(r);
-            move.moves.add(push);
-            move.movesNum++;
-            move.grid = newGrid;
-            move.p = push.p;
-            routes.add(move);
-        }
-    }
+//    private void generateMoves(Point start, int[][] grid, Set<Point> moves, Route r) {
+//        for (Point p : moves) {
+//            int[][] newGrid = copyGrid(grid);
+//            Move push = simulatePush(start.x, start.y, p.x, p.y, newGrid);
+//            if (push == null || visited.contains(newGrid)) continue;
+//            Route move = new Route(r);
+//            move.moves.add(push);
+//            move.movesNum++;
+//            move.grid = newGrid;
+//            move.p = push.p;
+//            routes.add(move);
+//        }
+//    }
 
 
     private Move simulatePush(int playerX, int playerY, int boulderX, int boulderY, int[][] grid) {
@@ -321,20 +337,20 @@ public class Solver {
     private static class Route implements Comparable<Route> {
         private int[][] grid;
         private int movesNum;
-        private final Queue<Move> moves;
+        private final Stack<Move> moves;
         private Point p;
 
         Route() {
             this.movesNum = 0; // Set default moves to 0
-            this.moves = new LinkedList<>(); // Initialize move list
+            this.moves = new Stack<>(); // Initialize move list
         }
 
-        Route(Route r) {
-            this.moves = new LinkedList<>(r.moves); // Insert another moveList to current moveList
-            this.grid = r.grid; // Insert another grids, players, and moves to current Route
-            this.p = r.p;
-            this.movesNum = r.movesNum;
-        }
+//        Route(Route r) {
+//            this.moves = new Stack<>(r.moves); // Insert another moveList to current moveList
+//            this.grid = r.grid; // Insert another grids, players, and moves to current Route
+//            this.p = r.p;
+//            this.movesNum = r.movesNum;
+//        }
 
         @Override
         public int compareTo(Route r) {
