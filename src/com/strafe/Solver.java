@@ -15,8 +15,6 @@ public class Solver {
     private final HashSet<int[][]> visited;
     private long time1;
     public int solutions = 5;
-    private int solutionsLength = 1;
-    private int fastestSolution = 0;
 
     public Solver(int[][] solveGrid) {
         this.grid = solveGrid;
@@ -119,7 +117,7 @@ public class Solver {
                 return x < 5 && grid[x + 1][y] == 1 && grid[x + 2][y] == 0;
             }
             case "R" -> {
-                return y < 4 && grid[x][y + 1] == 1 && grid[x][y + 2] == 0;
+                return y < 5 && grid[x][y + 1] == 1 && grid[x][y + 2] == 0;
             }
             case "L" -> {
                 return y > 2 && grid[x][y - 1] == 1 && grid[x][y - 2] == 0;
@@ -181,63 +179,63 @@ public class Solver {
     }
 
 
-    public boolean solve() {
-        int solutions = 0;
-
-        solvedRoutes = new TreeSet<>();
-        Route initial = new Route();
-
-        initial.grid = grid;
-        initial.p = new Point(7, 0); // Initial location
-        routes.add(initial); // root node
-
-        while (!routes.isEmpty()) {
-            if (solutions > 5) break; // Prevents more than 5 solutions from created
-            Route r = routes.poll(); // already visited
-            if (r == null || visited.contains(r.grid)) continue; // Catching error
-            visited.add(r.grid);
-
-            if (r.p.x == 0) { // Stops searching once it reaches goal
-                solvedRoutes.add(r); //Adds path to solvedRoutes set
-                solutions++;
-                continue;
-            }
-
-            grid = r.grid;
-            HashSet<Point> playerLocations = new HashSet<>();
-            Queue<Point> nextMove = new LinkedList<>();
-
-            nextMove.add(r.p);
-            while (!nextMove.isEmpty()) { // Iterates through nextMove queue
-                Point cPos = nextMove.poll();
-                if (playerLocations.contains(cPos))
-                    continue; // Pulls player location from nextMove and checks if it already existed
-                playerLocations.add(cPos);
-                Set<Point> moves = validMoves(cPos); // Generates possible moves from location, checks if it is valid
-                for (Point p1 : moves) {
-                    if (p1.x == 0) { // Check if it reaches finishing line (x=0)
-                        solvedRoutes.add(r);
-                        solutions++;
-                        nextMove.clear();
-                        continue;
-                    }
-                    if (grid[p1.x][p1.y] != 1) {
-                        nextMove.add(p1);  // Checks if there is a boulder, if it does not add to possible Moves
-                    }
-                }
-            }
-//            for (Point p : playerLocations) { // Iterates through every possible position player can get to without moving a Boulder
-//                generateMoves(p, grid, validMoves(p), r); // Checks if there is a valid boulder movement
+//    public boolean solve() {
+//        int solutions = 0;
+//
+//        solvedRoutes = new TreeSet<>();
+//        Route initial = new Route();
+//
+//        initial.grid = grid;
+//        initial.p = new Point(7, 0); // Initial location
+//        routes.add(initial); // root node
+//
+//        while (!routes.isEmpty()) {
+//            if (solutions > 5) break; // Prevents more than 5 solutions from created
+//            Route r = routes.poll(); // already visited
+//            if (r == null || visited.contains(r.grid)) continue; // Catching error
+//            visited.add(r.grid);
+//
+//            if (r.p.x == 0) { // Stops searching once it reaches goal
+//                solvedRoutes.add(r); //Adds path to solvedRoutes set
+//                solutions++;
+//                continue;
 //            }
-        }
-        if (solutions != 0) {
-            Route r = solvedRoutes.pollFirst();
-            if (r == null) return false; // Catching error
-            solvedRoute = r;
-            return true; // returns true if number of solution is greater than 0
-        }
-        return false;
-    }
+//
+//            grid = r.grid;
+//            HashSet<Point> playerLocations = new HashSet<>();
+//            Queue<Point> nextMove = new LinkedList<>();
+//
+//            nextMove.add(r.p);
+//            while (!nextMove.isEmpty()) { // Iterates through nextMove queue
+//                Point cPos = nextMove.poll();
+//                if (playerLocations.contains(cPos))
+//                    continue; // Pulls player location from nextMove and checks if it already existed
+//                playerLocations.add(cPos);
+//                Set<Point> moves = validMoves(cPos); // Generates possible moves from location, checks if it is valid
+//                for (Point p1 : moves) {
+//                    if (p1.x == 0) { // Check if it reaches finishing line (x=0)
+//                        solvedRoutes.add(r);
+//                        solutions++;
+//                        nextMove.clear();
+//                        continue;
+//                    }
+//                    if (grid[p1.x][p1.y] != 1) {
+//                        nextMove.add(p1);  // Checks if there is a boulder, if it does not add to possible Moves
+//                    }
+//                }
+//            }
+////            for (Point p : playerLocations) { // Iterates through every possible position player can get to without moving a Boulder
+////                generateMoves(p, grid, validMoves(p), r); // Checks if there is a valid boulder movement
+////            }
+//        }
+//        if (solutions != 0) {
+//            Route r = solvedRoutes.pollFirst();
+//            if (r == null) return false; // Catching error
+//            solvedRoute = r;
+//            return true; // returns true if number of solution is greater than 0
+//        }
+//        return false;
+//    }
 
 //    private void generateMoves(Point start, int[][] grid, Set<Point> moves, Route r) {
 //        for (Point p : moves) {
@@ -254,75 +252,75 @@ public class Solver {
 //    }
 
 
-    private Move simulatePush(int playerX, int playerY, int boulderX, int boulderY, int[][] grid) {
-        if (boulderX < 0 || boulderY < 0 || boulderX >= 7 || boulderY > 7 || grid[boulderX][boulderY] != 1)
-            return null; // Making sure it is within boundaries
-
-        if (boulderX - playerX == -1) { // go up
-            if (boulderX == 2) return null; // the row below finish line
-            if (grid[boulderX - 1][boulderY] == 0) { // Check if there is a box
-                grid[boulderX - 1][boulderY] = 1;
-                grid[boulderX][boulderY] = 0;
-                Move move = new Move();
-                move.p = new Point(boulderX, boulderY);
-                move.direction = "U";
-                return move;
-            }
-        } else if (boulderX - playerX == 1) { // go down
-            if (grid[boulderX + 1][boulderY] == 0) { // check for box
-                grid[boulderX + 1][boulderY] = 1;
-                grid[boulderX][boulderY] = 0;
-                Move move = new Move();
-                move.p = new Point(boulderX, boulderY);
-                move.direction = "D";
-                return move;
-            }
-        } else if (boulderY - playerY == -1) { // go left
-            if (boulderY == 0) return null; // check for boundaries
-            if (grid[boulderX][boulderY - 1] == 0) { // check for box
-                grid[boulderX][boulderY - 1] = 1;
-                grid[boulderX][boulderY] = 0;
-                Move move = new Move();
-                move.p = new Point(boulderX, boulderY);
-                move.direction = "L";
-                return move;
-            }
-        } else if (boulderY - playerY == 1) { // go right
-            if (boulderY == 6) return null;
-            if (grid[boulderX][boulderY + 1] == 0) { // check for box
-                grid[boulderX][boulderY + 1] = 1;
-                grid[boulderX][boulderY] = 0;
-                Move move = new Move();
-                move.p = new Point(boulderX, boulderY);
-                move.direction = "R";
-                return move;
-            }
-        }
-        return null;
-    }
-
-    private Set<Point> validMoves(Point s) {
-        HashSet<Point> vMoves = new HashSet<>();
-        int x = s.x;
-        int y = s.y;
-        if (y > 0 && y < 6) {
-            vMoves.add(new Point(x, y + 1));
-            vMoves.add(new Point(x, y - 1));
-        } else if (y == 0) {
-            vMoves.add(new Point(x, y + 1));
-        } else if (y == 6) {
-            vMoves.add(new Point(x, y - 1));
-        }
-        if (x > 0 && x < 7) {
-            vMoves.add(new Point(x + 1, y));
-            vMoves.add(new Point(x - 1, y));
-        } else if (x == 0) {
-            vMoves.add(new Point(x + 1, y));
-        } else if (x == 7) {
-            vMoves.add(new Point(x - 1, y));
-        }
-        return vMoves;
-    }
+//    private Move simulatePush(int playerX, int playerY, int boulderX, int boulderY, int[][] grid) {
+//        if (boulderX < 0 || boulderY < 0 || boulderX >= 7 || boulderY > 7 || grid[boulderX][boulderY] != 1)
+//            return null; // Making sure it is within boundaries
+//
+//        if (boulderX - playerX == -1) { // go up
+//            if (boulderX == 2) return null; // the row below finish line
+//            if (grid[boulderX - 1][boulderY] == 0) { // Check if there is a box
+//                grid[boulderX - 1][boulderY] = 1;
+//                grid[boulderX][boulderY] = 0;
+//                Move move = new Move();
+//                move.p = new Point(boulderX, boulderY);
+//                move.direction = "U";
+//                return move;
+//            }
+//        } else if (boulderX - playerX == 1) { // go down
+//            if (grid[boulderX + 1][boulderY] == 0) { // check for box
+//                grid[boulderX + 1][boulderY] = 1;
+//                grid[boulderX][boulderY] = 0;
+//                Move move = new Move();
+//                move.p = new Point(boulderX, boulderY);
+//                move.direction = "D";
+//                return move;
+//            }
+//        } else if (boulderY - playerY == -1) { // go left
+//            if (boulderY == 0) return null; // check for boundaries
+//            if (grid[boulderX][boulderY - 1] == 0) { // check for box
+//                grid[boulderX][boulderY - 1] = 1;
+//                grid[boulderX][boulderY] = 0;
+//                Move move = new Move();
+//                move.p = new Point(boulderX, boulderY);
+//                move.direction = "L";
+//                return move;
+//            }
+//        } else if (boulderY - playerY == 1) { // go right
+//            if (boulderY == 6) return null;
+//            if (grid[boulderX][boulderY + 1] == 0) { // check for box
+//                grid[boulderX][boulderY + 1] = 1;
+//                grid[boulderX][boulderY] = 0;
+//                Move move = new Move();
+//                move.p = new Point(boulderX, boulderY);
+//                move.direction = "R";
+//                return move;
+//            }
+//        }
+//        return null;
+//    }
+//
+//    private Set<Point> validMoves(Point s) {
+//        HashSet<Point> vMoves = new HashSet<>();
+//        int x = s.x;
+//        int y = s.y;
+//        if (y > 0 && y < 6) {
+//            vMoves.add(new Point(x, y + 1));
+//            vMoves.add(new Point(x, y - 1));
+//        } else if (y == 0) {
+//            vMoves.add(new Point(x, y + 1));
+//        } else if (y == 6) {
+//            vMoves.add(new Point(x, y - 1));
+//        }
+//        if (x > 0 && x < 7) {
+//            vMoves.add(new Point(x + 1, y));
+//            vMoves.add(new Point(x - 1, y));
+//        } else if (x == 0) {
+//            vMoves.add(new Point(x + 1, y));
+//        } else if (x == 7) {
+//            vMoves.add(new Point(x - 1, y));
+//        }
+//        return vMoves;
+//    }
 
     private int[][] copyGrid(int[][] g) {
         int[][] output = new int[g.length][g[0].length];
