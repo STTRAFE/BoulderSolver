@@ -47,15 +47,15 @@ public class Solver {
         }
     }
 
-//    public Queue<Move> getSteps() {
-//        return solvedRoute.moves;
-//    }
+    public Stack<Move> getSteps() {
+        return solvedRoute.moves;
+    }
 
 
-    public void dfs() {
+    public boolean dfs() {
         int[][] newGrid = copyGrid(grid);
         time1 = System.currentTimeMillis();
-        System.out.println(search(newGrid, 7, 0, solvedRoute));
+        return search(newGrid, 7,0,solvedRoute);
 //        for (int r = 0; r < grid.length; r++) {
 //            for (int c = 0; c < grid[0].length; c++) {
 //                search(newGrid,7,0,solvedRoute);
@@ -119,10 +119,10 @@ public class Solver {
                 return x < 5 && grid[x + 1][y] == 1 && grid[x + 2][y] == 0;
             }
             case "R" -> {
-                return y < 5 && grid[x][y + 1] == 1 && grid[x][y + 2] == 0;
+                return y < 4 && grid[x][y + 1] == 1 && grid[x][y + 2] == 0;
             }
             case "L" -> {
-                return y > 1 && grid[x][y - 1] == 1 && grid[x][y - 2] == 0;
+                return y > 2 && grid[x][y - 1] == 1 && grid[x][y - 2] == 0;
             }
 
         }
@@ -169,7 +169,7 @@ public class Solver {
                 if (g[x + 1][y] == 0 || g[x + 1][y] == 2) break;
                 g[x + 2][y] = 1;
             case "L":
-                if (g[x][y - 1] == 1 || g[x][y - 1] == 2) break;
+                if (g[x][y - 1] == 0 || g[x][y - 1] == 2) break;
                 g[x][y - 2] = 1;
                 g[x][y - 1] = 0;
             case "R":
