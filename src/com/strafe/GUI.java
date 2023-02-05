@@ -277,8 +277,8 @@ public class GUI implements ActionListener {
                 JOptionPane.showMessageDialog(buttonGrid, "No Solution");
             }
         } else if (e.getSource() == hintsButton) {
-            if (!boardUpdated(gridToSolve) && allHintsDisplayed) return; // Prevents user from adding hint count when all hints displayed
             inputGrid(); // input the map into gridToSolve
+            if (allHintsDisplayed) return; // Prevents user from adding hint count when all hints displayed
             allHintsDisplayed = false;
             Solver solve = new Solver(gridToSolve); // Initialize Solver
             if (solve.dfs()) { // Check if solvable
@@ -338,11 +338,13 @@ public class GUI implements ActionListener {
     }
 
     public void resetGrid() {
+        if (steps!=null) steps.clear();
+        allHintsDisplayed = false;
         stepsNum = 0;
         hintsUsed = 0;
-        for (int y = 0; y < COL - 1; y++) {
+        for (int y = 0; y < COL; y++) {
             for (int x = 0; x < ROWS; x++) {
-                grid[x][y].setColor(Color.WHITE);
+                if (y != 6) grid[x][y].setColor(Color.WHITE);
                 grid[x][y].setIcon((Icon) null);
                 grid[x][y].setPressed(false);
                 grid[x][y].setTextOnButton(null);
@@ -356,7 +358,7 @@ public class GUI implements ActionListener {
             for (int x = 0; x < ROWS; x++) {
                 grid[x][y].setIcon((Icon) null);
                 grid[x][y].setTextOnButton(null);
-                if (grid[x][y].isPressed()) grid[x][y].setColor(Color.RED);
+                if (grid[x][y].isPressed()) grid[x][y].setBoulderColor();
             }
         }
     }

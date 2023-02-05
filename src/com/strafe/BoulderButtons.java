@@ -50,20 +50,26 @@ public class BoulderButtons extends JButton implements ActionListener {
     public void setTextOnButton(String s) {
         this.setText(s);
     }
-
+    public void setBoulderColor() {
+        double i = Math.random();
+        double j = Math.random();
+        if (i > j) {
+            this.setColor(Color.decode("#7B3F00"));
+        } else {
+            this.setColor(Color.decode("#C19A6B"));
+        }
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         if (!canInteract) return;
         if (!pressed && this.y != 6 && this.y!= 0) {
-            this.setBackground(Color.RED);
+            this.setBoulderColor();
             this.setOpaque(true);
             pressed = true;
-//            System.out.println("Pressed " + x + " " + y);
         } else if (this.y != 6 && this.y != 0){
             this.setBackground(Color.WHITE);
             this.setOpaque(true);
             pressed = false;
-//            System.out.println("Unpressed " + x + " " + y);
         } else if (this.x == 0 && this.y == 6) {
             JOptionPane.showMessageDialog(this,"Starting Position, cannot interact");
         } else {
