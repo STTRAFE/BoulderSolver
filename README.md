@@ -11,15 +11,15 @@ This program provides a solution for the puzzle game Boulder. It allows users to
 - History button to view previously saved maps
 - Tracks the number of hints or solver uses for each map
 
-![Sample Map](https://imgur.com/a/L55f5UQ)
-
-![Impossible Map](https://imgur.com/a/xdkHeX4)
-
 ## How it Works
 
 Users can place boulders on the grid by clicking squares, with the top and bottom rows remaining empty. Pressing the solve button will run a depth-first search algorithm to find the shortest path to the finish, taking into account rules like only being able to push boulders one space at a time.
 
 Hints reveal the solution incrementally with each button press. Maps and hint usages are saved to a text file. The history feature displays the last 4 configurations along with hint data. Error handling prevents crashes from invalid inputs.
+
+![Sample Map](https://github.com/STTRAFE/BoulderSolver2/blob/strafe/Sample%20Map.png)
+
+![Impossible Map](https://github.com/STTRAFE/BoulderSolver2/blob/strafe/Impossible%20Map.png)
 
 ## Usage
 
