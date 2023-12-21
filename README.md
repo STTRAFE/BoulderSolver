@@ -16,9 +16,9 @@ Users can place boulders on the grid by clicking squares, with the top and botto
 
 Hints reveal the solution incrementally with each button press.
 
-![Sample Map]()
+![Sample Map](https://github.com/JasonH53/BoulderSolver/blob/strafe/Images/Sample%20Map.png)
 
-![Impossible Map]()
+![Impossible Map](https://github.com/JasonH53/BoulderSolver/blob/strafe/Images/Impossible%20Map.png)
 
 ## Usage
 
