@@ -32,9 +32,3 @@ To use the program, follow these steps:
 5. View the history of past games.
    
 This program provides an interactive way to learn solutions for Boulder puzzles.
-
-## Development
-
-The program was designed with wireframes, flowcharts, and pseudocode to plan components and logic. A depth-first search algorithm efficiently solves maps. Data is persisted to track progress. Thorough testing ensured all requirements were met.
-
-This Boulder game solver allows users to engage with the puzzle game through an interactive interface that conveniently solves configurations and stores results.
