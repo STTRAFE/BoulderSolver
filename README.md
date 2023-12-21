@@ -16,9 +16,9 @@ Users can place boulders on the grid by clicking squares, with the top and botto
 
 Hints reveal the solution incrementally with each button press.
 
-![Sample Map](https://github.com/STTRAFE/BoulderSolver2/blob/strafe/Sample%20Map.png)
+![Sample Map]()
 
-![Impossible Map](https://github.com/STTRAFE/BoulderSolver2/blob/strafe/Impossible%20Map.png)
+![Impossible Map]()
 
 ## Usage
 
