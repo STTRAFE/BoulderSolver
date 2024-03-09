@@ -2,14 +2,6 @@
 
 This program provides a solution for the puzzle game Boulder. It allows users to place boulders on a 7x7 grid and then solves the puzzle to find the optimal path to the finishing point.
 
-## Key Features
-
-- 7x7 grid where users can place boulders
-- Solve button to find the optimal solution path
-- Hints button to reveal the solution one step at a time
-- Save button to store grid configurations
-- History button to view previously saved maps
-
 ## How it Works
 
 Users can place boulders on the grid by clicking squares, with the top and bottom rows remaining empty. Pressing the solve button will run an algorithm to find the shortest path to the finish, taking into account rules like only being able to push boulders one space at a time.
