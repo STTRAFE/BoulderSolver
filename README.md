@@ -8,17 +8,4 @@ Users can place boulders on the grid by clicking squares, with the top and botto
 
 Hints reveal the solution incrementally with each button press.
 
-![Sample Map](https://github.com/JasonH53/BoulderSolver/blob/strafe/Images/Sample%20Map.png)
-
-![Impossible Map](https://github.com/JasonH53/BoulderSolver/blob/strafe/Images/Impossible%20Map.png)
-
-## Usage
-
-To use the program, follow these steps:
-
-1. Place boulders on the grid by clicking squares.
-2. Click the solve button to see the optimal route.
-3. Press the hints button to get hints incrementally.
-4. Click "Save" to store maps.
-   
 This program provides an interactive way to learn solutions for Boulder puzzles.
