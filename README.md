@@ -1,6 +1,6 @@
 # Boulder Game Solver
 
-This program provides a solution for the puzzle game Boulder. similar to the Japanese game Sokoban. It allows users to place boulders on a 7x7 grid and then solve the puzzle to find the optimal path to the finishing point.
+This program provides a solution for the puzzle game Boulder, similar to the Japanese game Sokoban. It allows users to place boulders on a 7x7 grid and then solve the puzzle to find the optimal path to the finishing point.
 
 ## How it Works
 
