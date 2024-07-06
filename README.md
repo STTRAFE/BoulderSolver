@@ -7,5 +7,3 @@ This program provides a solution for the puzzle game Boulder. It allows users to
 Users can place boulders on the grid by clicking squares, with the top and bottom rows remaining empty. Pressing the solve button will run an algorithm to find the shortest path to the finish, taking into account rules like only being able to push boulders one space at a time.
 
 Hints reveal the solution incrementally with each button press.
-
-This program provides an interactive way to learn solutions for Boulder puzzles.
